@@ -18,6 +18,7 @@ export function createPostPreview(
     status: ContentStatus;
     featured: boolean;
     pinned: boolean;
+    listed: boolean;
     commentsEnabled: boolean;
     seoTitle: string;
     seoDescription: string;
@@ -45,6 +46,7 @@ export function createPostPreview(
     source: "api",
     featured: body.featured ?? false,
     pinned: body.pinned ?? false,
+    listed: body.listed ?? true,
     commentsEnabled: body.commentsEnabled ?? true,
     publishedAt: body.publishedAt ?? now,
     updatedAt: now,

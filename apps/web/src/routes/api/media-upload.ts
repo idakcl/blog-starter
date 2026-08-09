@@ -84,7 +84,9 @@ export const Route = createFileRoute("/api/media-upload")({
           }
 
           const payload = (await upstream.json().catch(() => null)) as
-            Array<{ src?: string }> | { src?: string } | null;
+            | Array<{ src?: string }>
+            | { src?: string }
+            | null;
           const entries = Array.isArray(payload) ? payload : payload ? [payload] : [];
           const uploaded = entries
             .map((entry) => normalizeUrl(base, entry?.src))

@@ -43,6 +43,7 @@ export type PostInput = Partial<{
   source: Post["source"];
   featured: boolean;
   pinned: boolean;
+  listed?: boolean;
   commentsEnabled: boolean;
   seoTitle: string;
   seoDescription: string;
@@ -69,6 +70,7 @@ export type CommentInput = {
 export type ListPostsOptions = {
   featured?: boolean;
   includeUnpublished?: boolean;
+  includeUnlisted?: boolean;
   limit?: number;
   offset?: number;
   query?: string;
@@ -140,6 +142,7 @@ export function drizzleRowToPost(
     source: row.source as Post["source"],
     featured: row.featured,
     pinned: row.pinned,
+    listed: row.listed ?? true,
     commentsEnabled: row.commentsEnabled,
     publishedAt: row.publishedAt ?? row.createdAt,
     updatedAt: row.updatedAt,

@@ -31,6 +31,7 @@ export type Post = {
   source: ContentSource;
   featured: boolean;
   pinned: boolean;
+  listed: boolean;
   commentsEnabled: boolean;
   publishedAt: string;
   updatedAt: string;

@@ -94,6 +94,7 @@ describe("localizePost", () => {
     source: "editor",
     featured: false,
     pinned: false,
+    listed: true,
     commentsEnabled: true,
     publishedAt: "2024-01-01T00:00:00.000Z",
     updatedAt: "2024-01-01T00:00:00.000Z",

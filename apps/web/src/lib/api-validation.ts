@@ -107,6 +107,7 @@ export const PostWriteSchema = z
     source: ContentSourceSchema.optional(),
     featured: z.boolean().optional(),
     pinned: z.boolean().optional(),
+    listed: z.boolean().optional(),
     commentsEnabled: z.boolean().optional(),
     seoTitle: z.string().optional(),
     seoDescription: z.string().optional(),

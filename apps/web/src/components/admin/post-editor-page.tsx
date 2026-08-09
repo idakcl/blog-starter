@@ -133,12 +133,17 @@ export function PostEditorPage({ postId }: PostEditorPageProps) {
         : typeof publishedAtValue === "string"
           ? datetimeLocalToIso(publishedAtValue)
           : undefined;
+    const aliasValue =
+      typeof formData.get("slug") === "string" ? (formData.get("slug") as string).trim() : "";
+    // 新文章且未填别名时，自动生成 16 位随机链接（文章名是汉字，不塞进 URL）。
+    const slug = !editingPost && !aliasValue ? generateRandomSlug(16) : aliasValue;
 
     const response = await fetch(endpoint, {
       method: editingPost ? "PATCH" : "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
         title: formData.get("title"),
+        slug,
         excerpt: formData.get("excerpt"),
         coverImage: formData.get("coverImage"),
         contentMarkdown: markdown,
@@ -146,6 +151,7 @@ export function PostEditorPage({ postId }: PostEditorPageProps) {
         publishedAt,
         featured: formData.get("featured") === "on",
         pinned: formData.get("pinned") === "on",
+        listed: formData.get("listed") === "on",
         commentsEnabled: formData.get("commentsEnabled") === "on",
         seriesId: formData.get("seriesId") || null,
         tags: parseTagNames(typeof tagsValue === "string" ? tagsValue : ""),
@@ -409,6 +415,28 @@ function parseTagNames(value: string) {
     .split(/[,\n]/)
     .map((name) => name.trim())
     .filter(Boolean);
+}
+
+const RANDOM_SLUG_ALPHABET = "abcdefghijklmnopqrstuvwxyz0123456789";
+
+function generateRandomSlug(length = 16): string {
+  const bytes = new Uint8Array(length);
+
+  if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+    crypto.getRandomValues(bytes);
+  } else {
+    for (let index = 0; index < length; index += 1) {
+      bytes[index] = Math.floor(Math.random() * 256);
+    }
+  }
+
+  let out = "";
+
+  for (let index = 0; index < length; index += 1) {
+    out += RANDOM_SLUG_ALPHABET[bytes[index] % RANDOM_SLUG_ALPHABET.length];
+  }
+
+  return out;
 }
 
 function datetimeLocalToIso(value: string) {

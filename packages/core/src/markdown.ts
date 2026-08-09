@@ -135,13 +135,29 @@ function inlineMarkdown(value: string) {
     .replace(/`([^`]+)`/g, "<code>$1</code>")
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
     .replace(/\*([^*]+)\*/g, "<em>$1</em>")
-    .replace(
-      /!\[([^\]]*)]\((https?:\/\/[^)\s]+|\/[^)\s]+)\)/g,
-      (substring: string, alt: string, url: string) =>
-        /\.(mp4|webm|ogg|ogv|mov|m4v|m3u8)(\?|#|$)/i.test(url)
-          ? `<video src="${url}" controls preload="metadata"></video>`
-          : `<img src="${url}" alt="${alt}" />`,
-    )
+    .replace(/!\[([^\]]*)]\(([^)\s]+)\)/g, (substring: string, alt: string, raw: string) => {
+      const posterMatch = /#poster=(.*)$/.exec(raw);
+      const url = posterMatch ? raw.slice(0, posterMatch.index) : raw;
+      let poster: string | undefined;
+
+      if (posterMatch?.[1]) {
+        try {
+          poster = decodeUriComponentSafe(posterMatch[1]);
+        } catch {
+          poster = undefined;
+        }
+      }
+
+      const isVideo = /\.(mp4|webm|ogg|ogv|mov|m4v|m3u8)(\?|#|$)/i.test(url);
+
+      if (isVideo) {
+        const posterAttr = poster ? ` poster="${poster}"` : "";
+        // playsinline + webkit-playsinline 让视频在微信/iOS 里页内播放，不跳系统播放器
+        return `<video src="${url}"${posterAttr} controls preload="metadata" playsinline webkit-playsinline></video>`;
+      }
+
+      return `<img src="${url}" alt="${alt}" />`;
+    })
     .replace(
       /(?<!!)\[([^\]]+)]\((https?:\/\/[^)\s]+|\/[^)\s]+)\)/g,
       '<a href="$2" rel="noreferrer">$1</a>',
@@ -154,4 +170,8 @@ export function htmlToText(html: string) {
     .replace(/<[^>]+>/g, "")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function decodeUriComponentSafe(value: string): string {
+  return decodeURIComponent(value);
 }

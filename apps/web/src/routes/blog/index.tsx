@@ -35,6 +35,51 @@ export const Route = createFileRoute("/blog/")({
         pageSize: BLOG_PAGE_SIZE,
       },
     }),
+  head: ({ loaderData }) => {
+    const settings = loaderData?.siteSettings;
+    const locale = (
+      typeof navigator === "undefined"
+        ? "zh"
+        : (navigator.language || "zh").startsWith("zh")
+          ? "zh"
+          : "en"
+    ) as "zh" | "en";
+    const siteUrl = (settings?.url ?? "").replace(/\/$/, "");
+    const title = locale === "zh" ? "博客" : "Blog";
+    const description = settings?.description ?? "";
+    const image = settings?.defaultOgImage?.trim()
+      ? (() => {
+          try {
+            return new URL(
+              settings.defaultOgImage.trim(),
+              siteUrl || "http://localhost",
+            ).toString();
+          } catch {
+            return settings.defaultOgImage.trim();
+          }
+        })()
+      : "";
+
+    return {
+      meta: [
+        { title: `${title} · ${settings?.name ?? ""}` },
+        { name: "description", content: description },
+        { property: "og:type", content: "website" },
+        { property: "og:title", content: `${title} · ${settings?.name ?? ""}` },
+        { property: "og:description", content: description },
+        { property: "og:url", content: `${siteUrl}/blog` },
+        { name: "twitter:card", content: image ? "summary_large_image" : "summary" },
+        { name: "twitter:title", content: `${title} · ${settings?.name ?? ""}` },
+        { name: "twitter:description", content: description },
+        ...(image
+          ? [
+              { property: "og:image", content: image },
+              { name: "twitter:image", content: image },
+            ]
+          : []),
+      ],
+    };
+  },
   component: BlogIndexPage,
 });
 

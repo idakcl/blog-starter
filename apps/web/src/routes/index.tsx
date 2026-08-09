@@ -16,8 +16,49 @@ import { m } from "#/paraglide/messages.js";
 
 export const Route = createFileRoute("/")({
   loader: (): Promise<HomePageData> => $getHomePageData(),
+  head: ({ loaderData }) => {
+    const settings = loaderData?.siteSettings;
+    const siteUrl = (settings?.url ?? "").replace(/\/$/, "");
+    const title = settings?.name ?? "Blog";
+    const description = settings?.description ?? "";
+    const image = settings?.defaultOgImage?.trim()
+      ? absoluteOgUrl(settings.defaultOgImage.trim(), siteUrl)
+      : "";
+
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:type", content: "website" },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:url", content: siteUrl || "/" },
+        { name: "twitter:card", content: image ? "summary_large_image" : "summary" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+        ...(image
+          ? [
+              { property: "og:image", content: image },
+              { name: "twitter:image", content: image },
+            ]
+          : []),
+      ],
+    };
+  },
   component: HomePage,
 });
+
+function absoluteOgUrl(value: string, siteUrl: string) {
+  if (!value) {
+    return "";
+  }
+
+  try {
+    return new URL(value, siteUrl || "http://localhost").toString();
+  } catch {
+    return value;
+  }
+}
 
 type HomeViewProps = {
   readonly posts: Post[];
@@ -79,7 +120,7 @@ function HomePage() {
         <div className="mb-10">
           <h1 className="text-3xl font-semibold tracking-tight">{siteSettings.name}</h1>
           {siteSettings.authorBio ? (
-            <p className="mt-3 max-w-2xl text-muted-foreground leading-7">
+            <p className="mt-3 max-w-2xl leading-7 text-muted-foreground">
               {siteSettings.authorBio}
             </p>
           ) : null}
@@ -95,12 +136,12 @@ function HomePage() {
                   {formatDate(post.publishedAt, locale)}
                 </time>
                 <Link to="/blog/$slug" params={{ slug: post.slug }} className="group mt-1 block">
-                  <h3 className="text-xl font-semibold group-hover:text-link transition-colors">
+                  <h3 className="text-xl font-semibold transition-colors group-hover:text-link">
                     {post.title}
                   </h3>
                 </Link>
                 {post.excerpt ? (
-                  <p className="mt-2 text-muted-foreground leading-relaxed line-clamp-2">
+                  <p className="mt-2 line-clamp-2 leading-relaxed text-muted-foreground">
                     {post.excerpt}
                   </p>
                 ) : null}
@@ -111,7 +152,7 @@ function HomePage() {
                         key={tag.slug}
                         to="/tags/$slug"
                         params={{ slug: tag.slug }}
-                        className="text-xs text-muted-foreground hover:text-link transition-colors"
+                        className="text-xs text-muted-foreground transition-colors hover:text-link"
                       >
                         #{tag.name}
                       </Link>
@@ -122,7 +163,7 @@ function HomePage() {
             ))}
           </div>
         ) : (
-          <p className="text-muted-foreground py-8 text-center">
+          <p className="py-8 text-center text-muted-foreground">
             {m.no_posts_yet ? m.no_posts_yet() : "暂无文章"}
           </p>
         )}

@@ -28,6 +28,28 @@ import { getCmsDb } from "./cms-db";
 // ---------------------------------------------------------------------------
 
 const siteSettingsKey = "site";
+const SITE_SETTINGS_VERSION_KEY = "site:settings:version";
+
+/**
+ * 返回站点设置的版本戳（即 DB 行的 updatedAt）。
+ * 用于给公开 HTML 的边缘缓存键加版本，设置变更后能立刻让旧缓存失效，
+ * 否则保存站点名称等设置后要等边缘缓存（s-maxage=300）过期才生效。
+ */
+export async function getSiteSettingsCacheVersion(): Promise<string> {
+  return cachedGet(SITE_SETTINGS_VERSION_KEY, async () => {
+    try {
+      const db = getCmsDb();
+      const rows = await db
+        .select({ updatedAt: schema.siteSettings.updatedAt })
+        .from(schema.siteSettings)
+        .where(eq(schema.siteSettings.key, siteSettingsKey))
+        .limit(1);
+      return rows[0]?.updatedAt ?? "v0";
+    } catch {
+      return "v0";
+    }
+  });
+}
 
 export async function getD1SiteSettings(locale?: SupportedLocale) {
   const settings = await cachedGet("site:settings", () =>
@@ -63,7 +85,7 @@ export async function updateD1SiteSettings(input: SiteSettingsInput) {
       set: { value: settings, updatedAt: now },
     });
 
-  await invalidateCache("site:settings", "sitemap:paths");
+  await invalidateCache("site:settings", "sitemap:paths", SITE_SETTINGS_VERSION_KEY);
 
   return settings;
 }

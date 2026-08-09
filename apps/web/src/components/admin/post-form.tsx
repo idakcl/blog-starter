@@ -12,6 +12,7 @@ import {
   Loader2Icon,
   PencilLineIcon,
   UploadIcon,
+  VideoIcon,
   XIcon,
 } from "lucide-react";
 import {
@@ -43,6 +44,360 @@ const MdxEditorSurface = lazy(() =>
 );
 
 type FormSubmitHandler = NonNullable<ComponentProps<"form">["onSubmit"]>;
+
+type MediaItemStatus = "uploading" | "done" | "error";
+
+type MediaItem = {
+  id: string;
+  file: File;
+  name: string;
+  size: number;
+  kind: "image" | "video";
+  status: MediaItemStatus;
+  progress: number;
+  url?: string;
+  posterUrl?: string;
+  error?: string;
+  objectUrl?: string;
+  thumbUrl?: string;
+  controller?: AbortController;
+};
+
+// 把视频第一帧画到 canvas，返回 dataURL，用于在上传面板和文章里作为封面/背景。
+function captureVideoPoster(file: File): Promise<string | null> {
+  return new Promise((resolve) => {
+    const video = document.createElement("video");
+    video.preload = "metadata";
+    video.muted = true;
+    video.playsInline = true;
+
+    const objectUrl = URL.createObjectURL(file);
+    video.src = objectUrl;
+
+    let settled = false;
+    const finish = (value: string | null) => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      URL.revokeObjectURL(objectUrl);
+      resolve(value);
+    };
+
+    video.onloadeddata = () => {
+      const duration = Number.isFinite(video.duration) ? video.duration : 1;
+      video.currentTime = Math.min(0.1, duration / 2);
+    };
+    video.onseeked = () => {
+      try {
+        const canvas = document.createElement("canvas");
+        canvas.width = video.videoWidth || 480;
+        canvas.height = video.videoHeight || 270;
+        const context = canvas.getContext("2d");
+        context?.drawImage(video, 0, 0, canvas.width, canvas.height);
+        finish(canvas.toDataURL("image/jpeg", 0.72));
+      } catch {
+        finish(null);
+      }
+    };
+    video.onerror = () => finish(null);
+    setTimeout(() => finish(null), 5000);
+  });
+}
+
+// 把第一帧 dataURL 作为图片上传到图床，得到可外链的 poster URL。
+async function uploadPosterImage(dataUrl: string): Promise<string | undefined> {
+  const blob = await (await fetch(dataUrl)).blob();
+  const formData = new FormData();
+  formData.append("file", blob, "poster.jpg");
+
+  const response = await fetch("/api/media-upload", { method: "POST", body: formData }).catch(
+    () => null,
+  );
+
+  if (!response?.ok) {
+    return undefined;
+  }
+
+  const payload = (await response.json().catch(() => undefined)) as
+    | { data?: Array<{ url: string }> }
+    | undefined;
+
+  return payload?.data?.[0]?.url;
+}
+
+function formatBytes(bytes: number): string {
+  if (bytes >= 1024 * 1024 * 1024) {
+    return `${(bytes / 1024 / 1024 / 1024).toFixed(1)} GB`;
+  }
+  if (bytes >= 1024 * 1024) {
+    return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+  }
+  if (bytes >= 1024) {
+    return `${(bytes / 1024).toFixed(0)} KB`;
+  }
+  return `${bytes} B`;
+}
+
+// encodeURIComponent 不会转义 ( )，但 markdown 图片语法以 ) 结束 URL，
+// 所以这里把 ( ) 也转义，避免 poster 链接里带括号时把语法截断。
+function encodePosterParam(value: string): string {
+  return encodeURIComponent(value).replace(/\(/g, "%28").replace(/\)/g, "%29");
+}
+
+type UploadPanelCopy = ReturnType<typeof getPostFormCopy>;
+
+function MediaUploadPanel({
+  activeCount,
+  collapsed,
+  copy,
+  items,
+  minimized,
+  onCancel,
+  onClose,
+  onMinimize,
+  onRetry,
+  onRetryAll,
+  onToggleSection,
+  open,
+}: {
+  activeCount: number;
+  collapsed: { uploading: boolean; done: boolean; error: boolean };
+  copy: UploadPanelCopy;
+  items: MediaItem[];
+  minimized: boolean;
+  onCancel: (id: string) => void;
+  onClose: () => void;
+  onMinimize: () => void;
+  onRetry: (id: string) => void;
+  onRetryAll: () => void;
+  onToggleSection: (key: "uploading" | "done" | "error") => void;
+  open: boolean;
+}) {
+  if (!open) {
+    return activeCount > 0 ? (
+      <button
+        type="button"
+        onClick={onMinimize}
+        className="fixed right-4 bottom-4 z-50 inline-flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm font-medium shadow-2xl"
+      >
+        <UploadIcon className="size-4" />
+        {copy.uploadPanelTitle}
+        <span className="rounded-full bg-link/15 px-1.5 text-xs font-semibold text-link">
+          {activeCount}
+        </span>
+      </button>
+    ) : null;
+  }
+
+  const uploading = items.filter((item) => item.status === "uploading" && !item.url);
+  const done = items.filter((item) => item.status === "done");
+  const error = items.filter((item) => item.status === "error");
+
+  return (
+    <div className="fixed right-4 bottom-4 z-50 w-[372px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-border bg-card shadow-2xl">
+      <div className="flex items-center justify-between gap-2 border-b border-border bg-muted/40 px-3 py-2">
+        <div className="flex items-center gap-2 text-sm font-semibold">
+          <UploadIcon className="size-4" />
+          {copy.uploadPanelTitle}
+          {activeCount > 0 ? (
+            <span className="text-xs font-normal text-muted-foreground">
+              · {activeCount} {copy.uploadingLabel}
+            </span>
+          ) : null}
+        </div>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={onMinimize}
+            title={copy.minimize}
+            className="grid size-7 place-items-center rounded-md border border-border text-muted-foreground hover:bg-muted"
+          >
+            {minimized ? "▢" : "－"}
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            title={copy.close}
+            className="grid size-7 place-items-center rounded-md border border-border text-muted-foreground hover:bg-muted"
+          >
+            ×
+          </button>
+        </div>
+      </div>
+
+      {!minimized ? (
+        <div className="max-h-[60vh] space-y-2 overflow-auto p-2">
+          <UploadSection
+            collapsed={collapsed.uploading}
+            count={uploading.length}
+            label={copy.uploadingLabel}
+            onToggle={() => onToggleSection("uploading")}
+          >
+            {uploading.length === 0 ? (
+              <p className="px-1 py-2 text-xs text-muted-foreground">{copy.noneUploading}</p>
+            ) : (
+              uploading.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center gap-2 rounded-lg border border-border p-2"
+                >
+                  <MediaThumb item={item} />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm">{item.name}</p>
+                    <p className="text-xs text-muted-foreground">{formatBytes(item.size)}</p>
+                    <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted">
+                      <div
+                        className="h-full bg-link transition-all"
+                        style={{ width: `${item.progress}%` }}
+                      />
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => onCancel(item.id)}
+                    title={copy.cancel}
+                    className="grid size-7 shrink-0 place-items-center rounded-md border border-border text-muted-foreground hover:bg-muted"
+                  >
+                    <XIcon className="size-3.5" />
+                  </button>
+                </div>
+              ))
+            )}
+          </UploadSection>
+
+          <UploadSection
+            collapsed={collapsed.done}
+            count={done.length}
+            label={copy.doneLabel}
+            onToggle={() => onToggleSection("done")}
+          >
+            {done.length === 0 ? (
+              <p className="px-1 py-2 text-xs text-muted-foreground">{copy.noneDone}</p>
+            ) : (
+              done.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center gap-2 rounded-lg border border-border p-2"
+                >
+                  <MediaThumb item={item} />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm">{item.name}</p>
+                    <p className="text-xs text-muted-foreground">{formatBytes(item.size)}</p>
+                  </div>
+                </div>
+              ))
+            )}
+          </UploadSection>
+
+          <UploadSection
+            action={
+              error.length > 0 ? (
+                <button
+                  type="button"
+                  onClick={onRetryAll}
+                  className="rounded-md bg-destructive px-2 py-1 text-xs font-medium text-white hover:opacity-90"
+                >
+                  {copy.retryAll}
+                </button>
+              ) : undefined
+            }
+            collapsed={collapsed.error}
+            count={error.length}
+            label={copy.errorLabel}
+            onToggle={() => onToggleSection("error")}
+          >
+            {error.length === 0 ? (
+              <p className="px-1 py-2 text-xs text-muted-foreground">{copy.noneError}</p>
+            ) : (
+              error.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center gap-2 rounded-lg border border-destructive/40 p-2"
+                >
+                  <MediaThumb item={item} />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm">{item.name}</p>
+                    <p className="text-xs text-destructive">
+                      {item.error ?? copy.mediaUploadFailed}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => onRetry(item.id)}
+                    className="shrink-0 rounded-md border border-destructive px-2 py-1 text-xs font-medium text-destructive hover:bg-destructive/10"
+                  >
+                    {copy.retry}
+                  </button>
+                </div>
+              ))
+            )}
+          </UploadSection>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function UploadSection({
+  action,
+  children,
+  collapsed,
+  count,
+  label,
+  onToggle,
+}: {
+  action?: ReactNode;
+  children: ReactNode;
+  collapsed: boolean;
+  count: number;
+  label: string;
+  onToggle: () => void;
+}) {
+  return (
+    <section>
+      <div className="flex items-center justify-between px-1 py-1">
+        <button
+          type="button"
+          onClick={onToggle}
+          className="flex items-center gap-1.5 text-sm font-semibold"
+        >
+          <span className="text-muted-foreground">{collapsed ? "▸" : "▾"}</span>
+          {label}
+          <span className="rounded-full bg-muted px-1.5 text-xs font-medium text-muted-foreground">
+            {count}
+          </span>
+        </button>
+        {action}
+      </div>
+      {!collapsed ? <div className="space-y-1.5">{children}</div> : null}
+    </section>
+  );
+}
+
+function MediaThumb({ item }: { item: MediaItem }) {
+  if (item.kind === "video") {
+    return (
+      <div className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-md bg-destructive/10 text-destructive">
+        {item.thumbUrl ? (
+          <img src={item.thumbUrl} alt="" className="size-full object-cover" />
+        ) : (
+          <VideoIcon className="size-5" />
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-md bg-link/10 text-link">
+      {item.thumbUrl ? (
+        <img src={item.thumbUrl} alt="" className="size-full object-cover" />
+      ) : (
+        <ImageIcon className="size-5" />
+      )}
+    </div>
+  );
+}
 
 interface PostFormProps {
   editingPost: Post | null;
@@ -78,8 +433,25 @@ export function PostForm({
   const mediaFileInputRef = useRef<HTMLInputElement | null>(null);
   const sourceTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const markdownRef = useRef(markdown);
-  markdownRef.current = markdown;
-  const [mediaUploadState, setMediaUploadState] = useState<"idle" | "uploading" | "error">("idle");
+  useEffect(() => {
+    markdownRef.current = markdown;
+  }, [markdown]);
+  const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
+  const [panelOpen, setPanelOpen] = useState(false);
+  const [panelMinimized, setPanelMinimized] = useState(false);
+  const [collapsed, setCollapsed] = useState<{ uploading: boolean; done: boolean; error: boolean }>(
+    { uploading: false, done: true, error: false },
+  );
+  const queueRef = useRef<string[]>([]);
+  const inflightRef = useRef(0);
+  const CONCURRENCY = 10;
+  const mediaItemsRef = useRef<MediaItem[]>([]);
+  useEffect(() => {
+    mediaItemsRef.current = mediaItems;
+  }, [mediaItems]);
+  const activeUploadCount = mediaItems.filter(
+    (item) => item.status === "uploading" && !item.url,
+  ).length;
   const previewResult = useMemo(
     () => (editorMode === "preview" ? renderPreviewMarkdown(markdown) : null),
     [editorMode, markdown],
@@ -204,7 +576,7 @@ export function PostForm({
     onMarkdownChange(next);
   };
 
-  const handleMediaUpload = async (fileList: FileList | null) => {
+  const startMediaUpload = (fileList: FileList | null) => {
     const files = Array.from(fileList ?? []).filter(
       (file) => file.type.startsWith("image/") || file.type.startsWith("video/"),
     );
@@ -218,49 +590,202 @@ export function PostForm({
       return;
     }
 
-    setMediaUploadState("uploading");
+    const items: MediaItem[] = files.map((file, index) => {
+      const isVideo = file.type.startsWith("video/");
+      const objectUrl = isVideo ? undefined : URL.createObjectURL(file);
+      return {
+        id: `${Date.now()}-${index}-${Math.random().toString(36).slice(2, 8)}`,
+        file,
+        name: file.name,
+        size: file.size,
+        kind: isVideo ? "video" : "image",
+        status: "uploading" as const,
+        progress: 0,
+        objectUrl,
+        thumbUrl: objectUrl,
+      };
+    });
 
-    const snippets: string[] = [];
-    let failed = false;
+    setMediaItems((current) => [...current, ...items]);
+    queueRef.current.push(...items.map((item) => item.id));
+    setPanelOpen(true);
+    setPanelMinimized(false);
+    pumpQueue();
+  };
 
-    for (const file of files) {
+  const pumpQueue = () => {
+    while (inflightRef.current < CONCURRENCY && queueRef.current.length > 0) {
+      const id = queueRef.current.shift() as string;
+      const item = mediaItemsRef.current.find((candidate) => candidate.id === id);
+
+      if (!item) {
+        continue;
+      }
+
+      inflightRef.current += 1;
+      void uploadOne(item);
+    }
+  };
+
+  const uploadOne = async (item: MediaItem) => {
+    const controller = new AbortController();
+
+    setMediaItems((current) =>
+      current.map((candidate) =>
+        candidate.id === item.id ? { ...candidate, controller, progress: 0 } : candidate,
+      ),
+    );
+
+    try {
+      let thumbUrl = item.thumbUrl;
+
+      if (item.kind === "video") {
+        const frame = await captureVideoPoster(item.file).catch(() => null);
+
+        if (frame) {
+          thumbUrl = frame;
+          setMediaItems((current) =>
+            current.map((candidate) =>
+              candidate.id === item.id ? { ...candidate, thumbUrl: frame } : candidate,
+            ),
+          );
+        }
+      }
+
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", item.file);
 
       const response = await fetch("/api/media-upload", {
         method: "POST",
         body: formData,
+        signal: controller.signal,
       }).catch(() => null);
 
       if (!response?.ok) {
-        failed = true;
-        continue;
+        throw new Error("upload failed");
       }
 
       const payload = (await response.json().catch(() => undefined)) as
         | { data?: Array<{ name: string; contentType: string; url: string }> }
         | undefined;
-      const item = payload?.data?.[0];
+      const uploaded = payload?.data?.[0];
 
-      if (!item?.url) {
-        failed = true;
-        continue;
+      if (!uploaded?.url) {
+        throw new Error("no url");
       }
 
-      snippets.push(`![${item.name}](${item.url})`);
-    }
+      // 视频：把第一帧作为 poster 一并上传，嵌入 markdown 让文章里显示首帧背景。
+      let posterUrl: string | undefined;
 
-    if (snippets.length > 0) {
-      insertMediaSnippet(snippets.join("\n\n"));
-      toast.success(copy.mediaUploaded);
-    }
+      if (item.kind === "video" && thumbUrl?.startsWith("data:")) {
+        posterUrl = await uploadPosterImage(thumbUrl).catch(() => undefined);
+      }
 
-    if (failed) {
-      toast.error(m.admin_assets_error());
-    }
+      setMediaItems((current) =>
+        current.map((candidate) =>
+          candidate.id === item.id
+            ? {
+                ...candidate,
+                status: "done",
+                url: uploaded.url,
+                posterUrl,
+                progress: 100,
+                thumbUrl: thumbUrl ?? candidate.thumbUrl,
+              }
+            : candidate,
+        ),
+      );
 
-    setMediaUploadState("idle");
+      const snippet =
+        item.kind === "video" && posterUrl
+          ? `![${uploaded.name}](${uploaded.url}#poster=${encodePosterParam(posterUrl)})`
+          : `![${uploaded.name}](${uploaded.url})`;
+      insertMediaSnippet(snippet);
+    } catch (error) {
+      const canceled = error instanceof DOMException && error.name === "AbortError";
+
+      setMediaItems((current) =>
+        current.map((candidate) =>
+          candidate.id === item.id
+            ? {
+                ...candidate,
+                status: "error",
+                error: canceled ? copy.uploadCanceled : copy.mediaUploadFailed,
+                progress: 0,
+              }
+            : candidate,
+        ),
+      );
+
+      if (!canceled) {
+        toast.error(copy.mediaUploadFailed);
+      }
+    } finally {
+      inflightRef.current -= 1;
+      pumpQueue();
+    }
   };
+
+  const cancelUpload = (id: string) => {
+    const item = mediaItemsRef.current.find((candidate) => candidate.id === id);
+
+    if (item?.controller) {
+      item.controller.abort();
+    }
+
+    queueRef.current = queueRef.current.filter((queuedId) => queuedId !== id);
+  };
+
+  const retryUpload = (id: string) => {
+    const item = mediaItemsRef.current.find((candidate) => candidate.id === id);
+
+    if (!item) {
+      return;
+    }
+
+    setMediaItems((current) =>
+      current.map((candidate) =>
+        candidate.id === id
+          ? { ...candidate, status: "uploading", error: undefined, progress: 0 }
+          : candidate,
+      ),
+    );
+    queueRef.current.push(id);
+    setPanelOpen(true);
+    pumpQueue();
+  };
+
+  const retryAllFailed = () => {
+    const failedIds = mediaItemsRef.current
+      .filter((item) => item.status === "error")
+      .map((item) => item.id);
+
+    if (failedIds.length === 0) {
+      return;
+    }
+
+    setMediaItems((current) =>
+      current.map((item) =>
+        item.status === "error"
+          ? { ...item, status: "uploading", error: undefined, progress: 0 }
+          : item,
+      ),
+    );
+    queueRef.current.push(...failedIds);
+    setPanelOpen(true);
+    pumpQueue();
+  };
+
+  // mediaItemsRef 在渲染后通过 effect 同步，因此初始批次的 pumpQueue 必须在
+  // mediaItems 变更（ref 已同步）之后再触发，否则会找不到刚入队的条目。
+  // 用 ref 持有最新的 pumpQueue，避免把每次渲染都变化的闭包写进依赖数组。
+  const pumpQueueRef = useRef<() => void>(() => {});
+  useEffect(() => {
+    pumpQueueRef.current = pumpQueue;
+  });
+  useEffect(() => {
+    pumpQueueRef.current();
+  }, [mediaItems]);
 
   return (
     <form
@@ -288,6 +813,17 @@ export function PostForm({
               name="excerpt"
               defaultValue={editingPost?.excerpt ?? m.admin_editor_default_excerpt()}
             />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="editor-slug">{copy.slugLabel}</Label>
+            <Input
+              id="editor-slug"
+              name="slug"
+              placeholder={copy.slugPlaceholder}
+              defaultValue={editingPost?.slug ?? ""}
+              className="font-mono text-sm"
+            />
+            <p className="text-xs text-muted-foreground">{copy.slugHint}</p>
           </div>
         </div>
         <div className="flex flex-wrap gap-2 xl:justify-end">
@@ -430,6 +966,15 @@ export function PostForm({
               />
               {m.admin_editor_comments_enabled()}
             </label>
+            <label className="flex min-h-9 items-center gap-2 text-sm" title={copy.listedHint}>
+              <input
+                type="checkbox"
+                name="listed"
+                defaultChecked={editingPost?.listed ?? true}
+                className="size-4 rounded border-input"
+              />
+              {copy.listedLabel}
+            </label>
             <label className="flex min-h-9 items-center gap-2 text-sm">
               <input
                 type="checkbox"
@@ -483,15 +1028,15 @@ export function PostForm({
               type="button"
               variant="outline"
               onClick={() => mediaFileInputRef.current?.click()}
-              disabled={mediaUploadState === "uploading"}
               title={copy.insertMedia}
             >
-              {mediaUploadState === "uploading" ? (
-                <Loader2Icon className="size-4 animate-spin" />
-              ) : (
-                <ImagePlusIcon className="size-4" />
-              )}
+              <ImagePlusIcon className="size-4" />
               {copy.insertMedia}
+              {activeUploadCount > 0 ? (
+                <span className="ml-1 rounded-full bg-link/15 px-1.5 text-xs font-semibold text-link">
+                  {activeUploadCount}
+                </span>
+              ) : null}
             </Button>
             <input
               ref={mediaFileInputRef}
@@ -499,7 +1044,7 @@ export function PostForm({
               accept="image/*,video/*"
               multiple
               className="sr-only"
-              onChange={(event) => void handleMediaUpload(event.currentTarget.files)}
+              onChange={(event) => startMediaUpload(event.currentTarget.files)}
               suppressHydrationWarning
             />
           </div>
@@ -569,6 +1114,21 @@ export function PostForm({
           )
         ) : null}
       </div>
+
+      <MediaUploadPanel
+        activeCount={activeUploadCount}
+        collapsed={collapsed}
+        copy={copy}
+        items={mediaItems}
+        minimized={panelMinimized}
+        open={panelOpen}
+        onCancel={cancelUpload}
+        onClose={() => setPanelOpen(false)}
+        onMinimize={() => setPanelMinimized((value) => !value)}
+        onRetry={retryUpload}
+        onRetryAll={retryAllFailed}
+        onToggleSection={(key) => setCollapsed((current) => ({ ...current, [key]: !current[key] }))}
+      />
     </form>
   );
 }
@@ -660,35 +1220,74 @@ function useClientMounted() {
 function getPostFormCopy(locale: "en" | "zh") {
   if (locale === "zh") {
     return {
+      cancel: "取消",
       clearCover: "清空封面",
+      close: "关闭",
       coverInvalid: "请选择图片文件。",
       coverUploaded: "封面已上传",
+      doneLabel: "已完成",
       emptyCover: "拖入一张图片，或从本机选择图片作为封面。",
+      errorLabel: "失败",
       insertMedia: "插入图片/视频",
+      listedHint: "取消勾选后文章不出现在博客列表，仅管理员可见。",
+      listedLabel: "显示在博客列表",
       mediaInvalid: "请选择图片或视频文件。",
+      mediaUploadFailed: "上传失败",
       mediaUploaded: "媒体链接已插入",
+      minimize: "最小化",
+      noneDone: "暂无已完成的项目",
+      noneError: "暂无失败的项目",
+      noneUploading: "暂无上传中的项目",
       previewUnavailable: "预览暂时无法打开这段 Markdown。请切回源码继续编辑。",
+      retry: "重新上传",
+      retryAll: "失败的全部重新上传",
       richEditorUnavailable: "富文本编辑器无法打开这段 Markdown，可以先在源码模式继续编辑。",
       saving: "正在保存...",
+      slugHint: "留空则自动生成 16 位随机链接（文章名是汉字，不塞进 URL）。",
+      slugLabel: "别名 / 链接",
+      slugPlaceholder: "留空自动生成 16 位随机链接",
       sourceEditorLabel: "Markdown 源码",
+      uploadCanceled: "已取消",
+      uploadPanelTitle: "媒体上传",
+      uploadingLabel: "上传中",
       uploadCover: "上传封面",
     };
   }
 
   return {
+    cancel: "Cancel",
     clearCover: "Clear cover",
+    close: "Close",
     coverInvalid: "Choose an image file.",
     coverUploaded: "Cover uploaded",
+    doneLabel: "Completed",
     emptyCover: "Drop an image here, or choose one from your device.",
+    errorLabel: "Failed",
     insertMedia: "Insert image/video",
+    listedHint: "Uncheck to hide this post from the blog list. Visible to admins only.",
+    listedLabel: "Show in blog list",
     mediaInvalid: "Choose an image or video file.",
+    mediaUploadFailed: "Upload failed",
     mediaUploaded: "Media link inserted",
+    minimize: "Minimize",
+    noneDone: "No completed items",
+    noneError: "No failed items",
+    noneUploading: "No uploads in progress",
     previewUnavailable:
       "Preview could not open this Markdown. Switch back to source to keep editing.",
+    retry: "Retry",
+    retryAll: "Retry all failed",
     richEditorUnavailable:
       "The rich editor could not open this Markdown. Continue editing in source.",
     saving: "Saving...",
+    slugHint:
+      "Leave empty to auto-generate a 16-character random slug (Chinese titles are not used in the URL).",
+    slugLabel: "Alias / slug",
+    slugPlaceholder: "Empty = auto 16-char random slug",
     sourceEditorLabel: "Markdown source",
+    uploadCanceled: "Canceled",
+    uploadPanelTitle: "Media upload",
+    uploadingLabel: "Uploading",
     uploadCover: "Upload cover",
   };
 }

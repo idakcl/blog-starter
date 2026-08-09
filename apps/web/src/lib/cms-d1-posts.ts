@@ -35,6 +35,7 @@ import { getCmsDb } from "./cms-db";
 export async function listD1Posts({
   featured,
   includeUnpublished = false,
+  includeUnlisted = false,
   limit,
   offset,
   query = "",
@@ -47,6 +48,7 @@ export async function listD1Posts({
   // Cache the common case: published posts, no search query
   if (
     !includeUnpublished &&
+    !includeUnlisted &&
     featured === undefined &&
     !query &&
     !seriesSlug &&
@@ -55,12 +57,13 @@ export async function listD1Posts({
     normalizedOffset === 0
   ) {
     return cachedGet("posts:published", () =>
-      listD1PostsFromDb({ includeUnpublished: false, query: "" }),
+      listD1PostsFromDb({ includeUnpublished: false, includeUnlisted: false, query: "" }),
     );
   }
 
   return listD1PostsFromDb({
     includeUnpublished,
+    includeUnlisted,
     featured,
     limit: normalizedLimit,
     offset: normalizedOffset,
@@ -73,6 +76,7 @@ export async function listD1Posts({
 export async function countD1Posts({
   featured,
   includeUnpublished = false,
+  includeUnlisted = false,
   query = "",
   seriesSlug,
   tagSlug,
@@ -80,6 +84,7 @@ export async function countD1Posts({
   const db = getCmsDb();
   const conditions = await buildD1PostConditions({
     includeUnpublished,
+    includeUnlisted,
     featured,
     query,
     seriesSlug,
@@ -101,6 +106,7 @@ export async function countD1Posts({
 async function listD1PostsFromDb({
   featured,
   includeUnpublished = false,
+  includeUnlisted = false,
   limit,
   offset,
   query = "",
@@ -112,6 +118,7 @@ async function listD1PostsFromDb({
   const normalizedOffset = normalizeListOffset(offset);
   const conditions = await buildD1PostConditions({
     includeUnpublished,
+    includeUnlisted,
     featured,
     query,
     seriesSlug,
@@ -145,6 +152,7 @@ async function listD1PostsFromDb({
 async function buildD1PostConditions({
   featured,
   includeUnpublished = false,
+  includeUnlisted = false,
   query = "",
   seriesSlug,
   tagSlug,
@@ -154,6 +162,12 @@ async function buildD1PostConditions({
   const normalizedSeriesSlug = seriesSlug?.trim();
   const normalizedTagSlug = tagSlug?.trim();
   const conditions = [postVisibilityFilter(includeUnpublished)];
+
+  // 公开列表（未显式包含未列出项）默认隐藏“不显示在博客列表”的文章，
+  // 仅管理员在后台列表里通过 includeUnlisted 看到它们。
+  if (!includeUnlisted) {
+    conditions.push(eq(schema.posts.listed, true));
+  }
 
   if (featured !== undefined) {
     conditions.push(eq(schema.posts.featured, featured));
@@ -274,7 +288,8 @@ export async function getD1PostByIdOrSlug(idOrSlug: string, includeUnpublished =
 export async function createD1Post(input: PostInput) {
   const currentSettings = await getD1SiteSettings();
   const title = input.title?.trim() || "Untitled post";
-  const slug = await uniqueD1Slug(input.slug?.trim() || slugify(title));
+  const slugBase = input.slug?.trim() ? slugify(input.slug.trim()) : generateRandomSlug(16);
+  const slug = await uniqueD1Slug(slugBase);
   const now = new Date().toISOString();
   const contentMarkdown = input.contentMarkdown?.trim() || `# ${title}\n`;
   const contentHtml = input.contentHtml
@@ -299,6 +314,7 @@ export async function createD1Post(input: PostInput) {
     source,
     featured: input.featured ?? false,
     pinned: input.pinned ?? false,
+    listed: input.listed ?? true,
     commentsEnabled: input.commentsEnabled ?? true,
     publishedAt,
     updatedAt: now,
@@ -340,6 +356,7 @@ export async function createD1Post(input: PostInput) {
     source: post.source,
     featured: post.featured,
     pinned: post.pinned,
+    listed: post.listed,
     commentsEnabled: post.commentsEnabled,
     seoTitle: post.seoTitle,
     seoDescription: post.seoDescription,
@@ -388,7 +405,7 @@ export async function updateD1Post(idOrSlug: string, input: PostInput) {
         : post.contentText;
   const status = input.status ?? post.status;
   const slug =
-    !localizedUpdate && input.slug !== undefined
+    !localizedUpdate && input.slug && input.slug.trim()
       ? await uniqueD1Slug(slugify(input.slug.trim()), post.id)
       : post.slug;
   const now = new Date().toISOString();
@@ -419,6 +436,7 @@ export async function updateD1Post(idOrSlug: string, input: PostInput) {
   const commentsEnabled = input.commentsEnabled ?? post.commentsEnabled;
   const featured = input.featured ?? post.featured;
   const pinned = input.pinned ?? post.pinned;
+  const listed = input.listed ?? post.listed;
   const nextSeriesId = await resolveD1SeriesId(input);
 
   const db = getCmsDb();
@@ -435,6 +453,7 @@ export async function updateD1Post(idOrSlug: string, input: PostInput) {
       status,
       featured,
       pinned,
+      listed,
       commentsEnabled,
       seoTitle,
       seoDescription,
@@ -473,8 +492,7 @@ function buildPostI18n(
   // 正文随每次保存同步到 zh 本地化副本：否则编辑器保存（不带 locale=zh）只更新主字段，
   // zh 页面会一直渲染陈旧的 i18n.zh.contentHtml，导致新增的视频等媒体无法显示。
   if (normalized.contentMarkdown !== undefined) {
-    const html =
-      normalized.contentHtml ?? renderMarkdownToHtml(normalized.contentMarkdown);
+    const html = normalized.contentHtml ?? renderMarkdownToHtml(normalized.contentMarkdown);
     const text =
       normalized.contentHtml !== undefined
         ? htmlToText(normalized.contentHtml)
@@ -619,4 +637,28 @@ async function uniqueD1Slug(base: string, currentPostId?: string) {
     candidate = `${normalized}-${index}`;
     index += 1;
   }
+}
+
+const RANDOM_SLUG_ALPHABET = "abcdefghijklmnopqrstuvwxyz0123456789";
+
+// 生成 URL 安全的随机链接（默认 16 位）。文章名是汉字时，留空别名就用它当链接，
+// 避免把中文塞进 URL。
+export function generateRandomSlug(length = 16): string {
+  const bytes = new Uint8Array(length);
+
+  if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+    crypto.getRandomValues(bytes);
+  } else {
+    for (let i = 0; i < length; i += 1) {
+      bytes[i] = Math.floor(Math.random() * 256);
+    }
+  }
+
+  let out = "";
+
+  for (let i = 0; i < length; i += 1) {
+    out += RANDOM_SLUG_ALPHABET[bytes[i] % RANDOM_SLUG_ALPHABET.length];
+  }
+
+  return out;
 }

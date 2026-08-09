@@ -1,8 +1,9 @@
 import handler from "@tanstack/react-start/server-entry";
 
+import { getSiteSettingsCacheVersion } from "#/lib/cms-d1";
 import { sendDueWeeklyBlogUpdates } from "#/lib/email-notifications";
-import { paraglideMiddleware } from "#/paraglide/server.js";
 import { defineCustomServerStrategy } from "#/paraglide/runtime.js";
+import { paraglideMiddleware } from "#/paraglide/server.js";
 
 // Register a custom strategy that returns zh as the default locale
 // when no cookie or other locale indicator is present
@@ -66,7 +67,7 @@ async function handlePublicHtmlCache(
     return render();
   }
 
-  const cacheKey = createPublicHtmlCacheKey(request);
+  const cacheKey = await createPublicHtmlCacheKey(request);
   const defaultCache = getDefaultCache();
   const cached = await defaultCache.match(cacheKey);
 
@@ -87,9 +88,20 @@ async function handlePublicHtmlCache(
   return cacheableResponse;
 }
 
-function createPublicHtmlCacheKey(request: Request) {
+async function createPublicHtmlCacheKey(request: Request) {
   const url = new URL(request.url);
   url.searchParams.set("__html_cache_v", __PUBLIC_HTML_CACHE_VERSION__);
+
+  // 把站点设置的版本戳（updatedAt）并入缓存键：保存设置后立即让旧 HTML 缓存失效，
+  // 否则站点名称等改动要等边缘缓存（s-maxage=300）过期才生效。
+  try {
+    const settingsVersion = await getSiteSettingsCacheVersion();
+    if (settingsVersion) {
+      url.searchParams.set("__settings_v", settingsVersion);
+    }
+  } catch {
+    // 读取失败时不影响缓存，仅退化为按构建版本缓存
+  }
 
   return new Request(url, { method: "GET" });
 }

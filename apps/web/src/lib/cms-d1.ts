@@ -50,6 +50,7 @@ export {
 export {
   getD1SiteSettings,
   updateD1SiteSettings,
+  getSiteSettingsCacheVersion,
   listD1Assets,
   getD1AssetById,
   createD1Asset,

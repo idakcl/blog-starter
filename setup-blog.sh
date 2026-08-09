@@ -5,7 +5,7 @@
 # ============================================================
 set -euo pipefail
 
-SITE_URL="https://01mvpblog.dakcl.workers.dev"
+SITE_URL="https://log.hello.nyc.mn"
 ADMIN_NAME="ron"
 ADMIN_EMAIL="ron@example.com"
 ADMIN_PASSWORD="Admin123!@#"

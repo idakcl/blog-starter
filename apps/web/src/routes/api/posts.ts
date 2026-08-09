@@ -26,7 +26,13 @@ export const Route = createFileRoute("/api/posts")({
         const query = url.searchParams.get("q") ?? "";
         const tagSlug = url.searchParams.get("tag") ?? undefined;
         const seriesSlug = url.searchParams.get("series") ?? undefined;
-        const posts = await listD1Posts({ includeUnpublished, query, seriesSlug, tagSlug });
+        const posts = await listD1Posts({
+          includeUnpublished,
+          includeUnlisted: includeUnpublished,
+          query,
+          seriesSlug,
+          tagSlug,
+        });
 
         return jsonResponse({
           data: posts.map((post) => localizePost(post, locale)),

@@ -236,6 +236,14 @@ export const $getSiteSettingsPageData = createServerFn({ method: "GET" }).handle
   },
 );
 
+export const $getSiteSettings = createServerFn({ method: "GET" }).handler(
+  async (): Promise<SiteSettings> => {
+    const { getD1SiteSettings } = await import("./cms-d1");
+
+    return getD1SiteSettings();
+  },
+);
+
 export const $getAboutPageData = createServerFn({ method: "GET" }).handler(
   async (): Promise<AboutPageData> => {
     const { getD1SiteSettings } = await import("./cms-d1");

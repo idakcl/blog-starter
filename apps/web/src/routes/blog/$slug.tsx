@@ -41,10 +41,13 @@ export const Route = createFileRoute("/blog/$slug")({
     const siteUrl = siteSettings.url.replace(/\/$/, "");
     const canonicalUrl = `${siteUrl}/blog/${post.slug}`;
     const socialImage =
-      resolvePostCoverImage(post.coverImage) || siteSettings.defaultOgImage.trim();
+      resolvePostCoverImage(post.coverImage) ||
+      extractFirstImageUrl(post.contentMarkdown) ||
+      siteSettings.defaultOgImage.trim();
     const imageUrl = absoluteUrl(socialImage, siteUrl);
     const avatarUrl = absoluteUrl(siteSettings.avatarUrl, siteUrl);
-    const robots = siteSettings.indexingEnabled ? "index,follow" : "noindex,nofollow";
+    const robots =
+      !post.listed || !siteSettings.indexingEnabled ? "noindex,nofollow" : "index,follow";
     const jsonLd = {
       "@context": "https://schema.org",
       "@type": "BlogPosting",
@@ -143,6 +146,29 @@ function BlogPostPage() {
   const articleBody = buildArticleBody(localizedPost.contentHtml);
   const editLabel = locale === "zh" ? "编辑文章" : m.admin_posts_edit();
   const coverImage = resolvePostCoverImage(localizedPost.coverImage);
+
+  // 未勾选“显示在博客列表”的文章，仅管理员可见；其他访客看到提示而不是正文。
+  if (!localizedPost.listed && user?.role !== "admin") {
+    const unavailableCopy =
+      locale === "zh"
+        ? {
+            body: "这篇文章没有发布到博客列表，仅管理员可见。",
+            title: "文章未公开",
+          }
+        : {
+            body: "This post is not listed in the blog and is visible to admins only.",
+            title: "Post not available",
+          };
+
+    return (
+      <SiteShell siteSettings={localizedSiteSettings}>
+        <div className="mx-auto max-w-3xl px-4 py-24 text-center">
+          <h1 className="text-2xl font-semibold">{unavailableCopy.title}</h1>
+          <p className="mt-3 text-muted-foreground">{unavailableCopy.body}</p>
+        </div>
+      </SiteShell>
+    );
+  }
 
   return (
     <SiteShell siteSettings={localizedSiteSettings}>
@@ -467,6 +493,27 @@ function absoluteUrl(value: string, siteUrl: string) {
   }
 
   return new URL(value, siteUrl).toString();
+}
+
+// 从正文里取第一张图片（排除视频），作为分享卡片的封面图。
+function extractFirstImageUrl(markdown: string): string {
+  const matches = markdown.match(/!\[[^\]]*]\((https?:\/\/[^)\s]+|\/[^)\s]+)\)/g) ?? [];
+
+  for (const match of matches) {
+    const urlMatch = /\(([^)\s]+)\)/.exec(match);
+
+    if (!urlMatch?.[1]) {
+      continue;
+    }
+
+    const url = urlMatch[1].split("#poster=")[0];
+
+    if (!/\.(mp4|webm|ogg|ogv|mov|m4v|m3u8)(\?|#|$)/i.test(url)) {
+      return url;
+    }
+  }
+
+  return "";
 }
 
 type TocItem = {

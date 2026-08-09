@@ -1,5 +1,5 @@
 import type { AuthQueryResult } from "@repo/auth/tanstack/queries";
-import { getSiteSettingsForLocale } from "@repo/core";
+import { getSiteSettingsForLocale, localizeSiteSettings, type SiteSettings } from "@repo/core";
 import { Toaster } from "@repo/ui/components/sonner";
 import { getThemeScript, ThemeProvider } from "@repo/ui/lib/theme-provider";
 import type { QueryClient } from "@tanstack/react-query";
@@ -11,6 +11,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, useRef, useState, useTransition } from "react";
 
+import { $getSiteSettings } from "#/lib/cms-server";
 import { getCurrentLocale } from "#/lib/i18n";
 import { m } from "#/paraglide/messages.js";
 
@@ -22,10 +23,15 @@ interface MyRouterContext {
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
+  // 读取数据库里的站点设置（含保存后的站点名称），让 <title>/og:title 等全局生效。
+  // 公开页面的 loader 已经拿到 DB 设置，这里再给没有自定义 head 的路由（/docs、/series、/tags 等）兜底。
+  loader: (): Promise<SiteSettings> => $getSiteSettings(),
   // Protected routes load the user in /_auth/route.tsx.
   // Public auth affordances use the shared auth query without blocking SSR.
-  head: () => {
-    const siteSettings = getSiteSettingsForLocale(getCurrentLocale());
+  head: ({ loaderData }) => {
+    const siteSettings = loaderData
+      ? localizeSiteSettings(loaderData, getCurrentLocale())
+      : getSiteSettingsForLocale(getCurrentLocale());
 
     return {
       meta: [

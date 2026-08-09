@@ -55,6 +55,7 @@ export const posts = sqliteTable(
       .default("editor"),
     featured: integer("featured", { mode: "boolean" }).notNull().default(false),
     pinned: integer("pinned", { mode: "boolean" }).notNull().default(false),
+    listed: integer("listed", { mode: "boolean" }).notNull().default(true),
     commentsEnabled: integer("comments_enabled", { mode: "boolean" }).notNull().default(true),
     seoTitle: text("seo_title"),
     seoDescription: text("seo_description"),
