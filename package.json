@@ -9,7 +9,7 @@
     "dev": "pnpm run --recursive --parallel dev",
     "dev:web": "vp run --filter=@repo/web dev",
     "deploy": "pnpm run deploy:web",
-    "deploy:web": "node scripts/check-r2-buckets.mjs && pnpm build:web && pnpm run db:migrate:remote && pnpm --filter @repo/web exec wrangler deploy --config dist/server/wrangler.json && node scripts/sync-obsidian.mjs --if-configured",
+    "deploy:web": "node scripts/check-r2-buckets.mjs && pnpm build:web && pnpm run db:migrate:remote && (if [ -n \"$NETPAN_API_TOKEN\" ]; then echo \"$NETPAN_API_TOKEN\" | pnpm --filter @repo/web exec wrangler secret put NETPAN_API_TOKEN --config dist/server/wrangler.json; fi) && pnpm --filter @repo/web exec wrangler deploy --config dist/server/wrangler.json && node scripts/sync-obsidian.mjs --if-configured",
     "lint": "vp lint --type-aware --type-check",
     "lint:fix": "vp lint --type-aware --type-check --fix",
     "format": "vp fmt",
