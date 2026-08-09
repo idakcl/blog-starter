@@ -45,13 +45,5 @@ jobs:
           test -n "$CLOUDFLARE_ACCOUNT_ID"
           test -n "$CLOUDFLARE_API_TOKEN"
 
-      - name: Set Cloudflare secrets
-        env:
-          NETPAN_API_TOKEN: ${{ secrets.NETPAN_API_TOKEN }}
-        run: |
-          if [ -n "$NETPAN_API_TOKEN" ]; then
-            echo "$NETPAN_API_TOKEN" | pnpm --filter @repo/web exec wrangler secret put NETPAN_API_TOKEN --config dist/server/wrangler.json
-          fi
-
       - name: Deploy web app
         run: pnpm deploy:web
