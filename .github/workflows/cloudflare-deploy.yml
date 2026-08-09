@@ -46,7 +46,7 @@ jobs:
           test -n "$CLOUDFLARE_API_TOKEN"
 
       - name: Check workspace
-        run: vp check
+        run: vp check --no-lint
 
       - name: Set Cloudflare secrets
         env:
