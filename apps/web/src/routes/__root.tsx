@@ -195,6 +195,8 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
     <html lang={locale === "zh" ? "zh-CN" : "en"} suppressHydrationWarning>
       <head>
         <HeadContent />
+        {/* mdxeditor 的 diff 源码视图/代码块会引用全局 Prism；若缺失则富文本编辑器崩溃回 source 视图。 */}
+        <script src="/prism.min.js" />
       </head>
       <body>
         <ScriptOnce>{getThemeScript("theme", "system")}</ScriptOnce>

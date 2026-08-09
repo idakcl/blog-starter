@@ -619,7 +619,10 @@ export function PostForm({
       const item = mediaItemsRef.current.find((candidate) => candidate.id === id);
 
       if (!item) {
-        continue;
+        // mediaItemsRef 可能尚未同步（初始批次或重试时）。把 id 塞回队列，
+        // 等 useEffect([mediaItems]) 触发 pumpQueue 时 ref 已同步再处理。
+        queueRef.current.unshift(id);
+        break;
       }
 
       inflightRef.current += 1;
