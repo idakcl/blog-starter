@@ -58,8 +58,10 @@ export default {
     return handlePublicHtmlCache(
       request,
       () =>
-        paraglideMiddleware(request, ({ request: req, locale }) => {
-          const response = handler.fetch(req);
+        paraglideMiddleware(request, async ({ request: req, locale }) => {
+          // handler.fetch 返回 Promise<Response>，必须先 await 再处理，
+          // 否则拿到的 response 仍是 Promise，访问 .headers 会抛错并导致 Worker 1101。
+          const response = await handler.fetch(req);
           // 服务端按策略解析出 locale 后，仅在访问者尚未显式选择语言时把它写入
           // PARAGLIDE_LOCALE cookie。客户端 preferredLanguage 策略会先读到该 cookie，
           // 从而与 SSR 使用同一语言，避免水合时因 navigator.language 与服务端不一致
