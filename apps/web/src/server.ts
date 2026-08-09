@@ -41,6 +41,14 @@ const PUBLIC_HTML_CACHE_EXCLUDED_PREFIXES = [
 
 export default {
   fetch(request: Request, _env: CloudflareBindings, ctx: WorkerExecutionContext) {
+    // 强制 HTTPS：会话 cookie 带 Secure 标记，在 http:// 下会被浏览器丢弃，
+    // 导致后台读不到登录态而反复跳回登录页。统一把 http 请求 308 跳转到 https。
+    const httpsRedirect = redirectInsecureToHttps(request);
+
+    if (httpsRedirect) {
+      return httpsRedirect;
+    }
+
     const crossOriginWrite = rejectCrossOriginWrite(request);
 
     if (crossOriginWrite) {
@@ -157,6 +165,31 @@ function withPublicHtmlCacheHeaders(response: Response) {
     status: response.status,
     statusText: response.statusText,
   });
+}
+
+function redirectInsecureToHttps(request: Request): Response | null {
+  // Cloudflare 在请求头里带上真实协议；本地开发（无该头）不跳转。
+  const header =
+    request.headers.get("x-forwarded-proto") ?? request.headers.get("cf-visitor") ?? "";
+
+  let scheme = header;
+
+  if (header.startsWith("{")) {
+    try {
+      scheme = JSON.parse(header).scheme ?? "";
+    } catch {
+      scheme = "";
+    }
+  }
+
+  if (scheme.toLowerCase() === "https") {
+    return null;
+  }
+
+  const url = new URL(request.url);
+  url.protocol = "https:";
+
+  return Response.redirect(url.toString(), 308);
 }
 
 function rejectCrossOriginWrite(request: Request) {
