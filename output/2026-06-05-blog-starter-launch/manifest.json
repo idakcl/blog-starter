@@ -1,0 +1,39 @@
+{
+  "generatedAt": "2026-06-05T06:00:00.000Z",
+  "productionPosts": [
+    {
+      "title": "为什么我想做一个可以被 AI 维护的个人博客",
+      "slug": "why-i-built-an-ai-maintained-personal-blog",
+      "tags": ["01MVP", "AI Skill", "Cloudflare", "个人博客"],
+      "publishedAt": "2026-05-31T11:10:52.540Z"
+    },
+    {
+      "title": "这个博客为什么选 Cloudflare 全家桶",
+      "slug": "why-this-blog-uses-cloudflare-stack",
+      "tags": ["Cloudflare", "技术选型", "01MVP", "个人博客"],
+      "publishedAt": "2026-06-05T05:30:00.000Z"
+    },
+    {
+      "title": "用 AI 搭一个自己的个人博客，新手版完整流程",
+      "slug": "ai-setup-personal-blog-tutorial",
+      "tags": ["教程", "AI 建站", "Cloudflare", "01MVP"],
+      "publishedAt": "2026-06-05T05:45:00.000Z"
+    }
+  ],
+  "publicArticle": {
+    "title": "我把个人博客做成了一个可以被 AI 创建的网站",
+    "slug": "ai-created-personal-blog",
+    "date": "2026-06-05"
+  },
+  "files": [
+    "posts/*.md",
+    "production-posts.sql",
+    "wechat-article.md",
+    "wechat-article.html",
+    "2026-06-05-ai-created-personal-blog-cover.html",
+    "2026-06-05-ai-created-personal-blog.xhs-slides.html",
+    "x-twitter-copy.md",
+    "video-script.md",
+    "review-notes.md"
+  ]
+}

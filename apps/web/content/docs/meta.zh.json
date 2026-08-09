@@ -1,0 +1,15 @@
+{
+  "title": "01mvp-blog-starter",
+  "pages": [
+    "index",
+    "ai-setup",
+    "usage",
+    "content-systems",
+    "publishing",
+    "obsidian",
+    "comments",
+    "deployment",
+    "api",
+    "advanced-configuration"
+  ]
+}

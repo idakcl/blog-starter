@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "vite-plus": {
+      "source": "uinaf/skills",
+      "sourceType": "github",
+      "skillPath": "skills/vite-plus/SKILL.md",
+      "computedHash": "b804b33e9971f77bbd6bf22c578406028744882f79192ac03250db378237ba2d"
+    }
+  }
+}

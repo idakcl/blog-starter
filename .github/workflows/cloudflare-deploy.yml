@@ -1,0 +1,50 @@
+name: Deploy to Cloudflare
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: cloudflare-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy Worker
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: .node-version
+          cache: true
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.2.2
+          run_install: false
+
+      - name: Verify Cloudflare secrets
+        run: |
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+          test -n "$CLOUDFLARE_API_TOKEN"
+
+      - name: Check workspace
+        run: vp check
+
+      - name: Deploy web app
+        run: pnpm deploy:web

@@ -1,0 +1,21 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#FAF8F2"/>
+  <rect x="72" y="64" width="1056" height="502" rx="14" fill="#FFFEFB" stroke="#D9D2C4"/>
+  <path d="M120 142H1080" stroke="#E6E0D4"/>
+  <rect x="120" y="104" width="34" height="34" rx="7" fill="#2C261F"/>
+  <circle cx="128" cy="112" r="3.5" fill="#C6F55E"/>
+  <path d="M130 113H141L147 119V129C147 131.209 145.209 133 143 133H132C129.791 133 128 131.209 128 129V115C128 113.895 128.895 113 130 113Z" fill="#FFF8EA"/>
+  <path d="M141 113V117.5C141 118.328 141.672 119 142.5 119H147L141 113Z" fill="#E8DCC8"/>
+  <path d="M133 123H142" stroke="#2C261F" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M133 127H143" stroke="#2C261F" stroke-width="1.8" stroke-linecap="round" opacity="0.72"/>
+  <text x="172" y="128" fill="#312B25" font-family="ui-sans-serif, system-ui, sans-serif" font-size="24" font-weight="650">01mvp-blog-starter</text>
+  <text x="120" y="260" fill="#25211D" font-family="ui-sans-serif, system-ui, sans-serif" font-size="70" font-weight="680">Cloudflare-native</text>
+  <text x="120" y="340" fill="#25211D" font-family="ui-sans-serif, system-ui, sans-serif" font-size="70" font-weight="680">publishing system</text>
+  <text x="120" y="410" fill="#746D62" font-family="ui-sans-serif, system-ui, sans-serif" font-size="30" font-weight="450">Personal publishing system with bilingual posts, feeds, assets, and APIs.</text>
+  <rect x="120" y="474" width="156" height="44" rx="8" fill="#F0EAE0" stroke="#D9D2C4"/>
+  <text x="150" y="504" fill="#312B25" font-family="ui-sans-serif, system-ui, sans-serif" font-size="20" font-weight="600">D1 + R2</text>
+  <rect x="292" y="474" width="140" height="44" rx="8" fill="#F0EAE0" stroke="#D9D2C4"/>
+  <text x="322" y="504" fill="#312B25" font-family="ui-sans-serif, system-ui, sans-serif" font-size="20" font-weight="600">i18n</text>
+  <rect x="448" y="474" width="196" height="44" rx="8" fill="#F0EAE0" stroke="#D9D2C4"/>
+  <text x="478" y="504" fill="#312B25" font-family="ui-sans-serif, system-ui, sans-serif" font-size="20" font-weight="600">Theme presets</text>
+</svg>

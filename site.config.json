@@ -1,0 +1,31 @@
+{
+  "name": "我的博客",
+  "description": "记录与生活的个人空间",
+  "url": "https://01mvpblog.workers.dev",
+  "authorName": "ron",
+  "authorEmail": "ron@example.com",
+  "authorBio": "记录技术与生活。",
+  "locales": ["zh", "en"],
+  "primaryLanguage": "zh",
+  "i18n": {
+    "name": {
+      "en": "My Blog"
+    },
+    "description": {
+      "en": "A personal space for recording life."
+    },
+    "authorBio": {
+      "en": "Recording tech and life."
+    }
+  },
+  "i18nRuntime": "paraglide-js",
+  "themePreset": "maker",
+  "layoutPreset": "shelf",
+  "commentsEnabled": true,
+  "commentsRequireApproval": true,
+  "commentAutoBlockEnabled": true,
+  "commentBlockedKeywords": ["博彩", "赌博", "色情", "诈骗", "辱骂", "violence", "scam", "spam"],
+  "emailSendingEnabled": false,
+  "emailVerificationEnabled": false,
+  "githubActionsEnabled": false
+}

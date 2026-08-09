@@ -1,0 +1,52 @@
+{
+  "files.readonlyInclude": {
+    "**/routeTree.gen.ts": true,
+    "**/.tanstack/**/*": true,
+    "**/worker-configuration.d.ts": true,
+    "pnpm-lock.yaml": true
+  },
+  "files.watcherExclude": {
+    "**/routeTree.gen.ts": true,
+    "**/.tanstack/**/*": true,
+    "**/worker-configuration.d.ts": true,
+    "pnpm-lock.yaml": true
+  },
+  "search.exclude": {
+    "**/routeTree.gen.ts": true,
+    "**/.tanstack/**/*": true,
+    "**/worker-configuration.d.ts": true,
+    "pnpm-lock.yaml": true
+  },
+
+  // use LF line endings
+  "files.eol": "\n",
+
+  // disable prettier, eslint, biome
+  "prettier.enable": false,
+  "eslint.enable": false,
+  "biome.enabled": false,
+  // enable oxlint + oxfmt
+  "oxc.enable": true,
+
+  // oxfmt via vite+
+  "oxc.fmt.configPath": "./vite.config.ts",
+
+  // set oxfmt as default formatter
+  "editor.defaultFormatter": "oxc.oxc-vscode",
+
+  // format on save and paste
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+
+  // vite+ for npm scripts
+  "npm.scriptRunner": "vp",
+  "workbench.colorCustomizations": {
+    "editor.lineHighlightBackground": "#1073cf2d",
+    "editor.lineHighlightBorder": "#9fced11f",
+    "activityBar.background": "#41037C",
+    "titleBar.activeBackground": "#5B04AE",
+    "titleBar.activeForeground": "#FDFBFF",
+    "titleBar.inactiveBackground": "#41037C",
+    "titleBar.inactiveForeground": "#FDFBFF"
+  }
+}

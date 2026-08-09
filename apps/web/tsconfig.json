@@ -1,0 +1,15 @@
+{
+  "extends": "@repo/tsconfig/base.json",
+  "compilerOptions": {
+    "types": ["node", "vite/client"],
+    "paths": {
+      "#/*": ["./src/*"],
+      "collections/*": ["./.source/*"],
+
+      // for shadcn CLI
+      "@repo/ui/*": ["../../packages/ui/*"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
+}

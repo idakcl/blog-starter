@@ -1,0 +1,43 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "01mvpblog",
+  "main": "./src/server.ts",
+  "compatibility_date": "2026-05-24",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true,
+  },
+  "triggers": {
+    "crons": ["0 9 * * *"],
+  },
+  "vars": {
+    "VITE_BASE_URL": "https://01mvpblog.dakcl.workers.dev",
+    "CMS_PUBLIC_SITE_URL": "https://01mvpblog.dakcl.workers.dev",
+    "CMS_BACKUP_RETENTION_DAYS": "30",
+    "CMS_EMAIL_SENDING_ENABLED": "false",
+    "CMS_EMAIL_FROM": "",
+    "CMS_EMAIL_TO": "",
+    "CMS_PASSWORD_RESET_TTL_MINUTES": "30",
+    "VITE_TURNSTILE_SITE_KEY": "",
+  },
+  "d1_databases": [
+    {
+      "binding": "CMS_DB",
+      "database_name": "01mvpblog-cms",
+      "database_id": "f576f49d-a0d7-4c67-a6b6-e9180b4c4430",
+      "migrations_dir": "../../packages/db/migrations",
+    },
+  ],
+  "r2_buckets": [
+    {
+      "binding": "CMS_STORAGE",
+      "bucket_name": "01mvpblog-assets",
+    },
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "CMS_CACHE",
+      "id": "9e1325c648f9418bbd9ad1cddc6ef506",
+    },
+  ],
+}

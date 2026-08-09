@@ -1,0 +1,1433 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>我把个人博客做成了一个可以被 AI 创建的网站</title>
+  </head>
+  <body style="margin: 0; background: #eee">
+    <section
+      class="slide"
+      style="
+        width: 1080px;
+        height: 1350px;
+        box-sizing: border-box;
+        padding: 74px 76px;
+        background: #fff;
+        border: 3px solid #111;
+        color: #111;
+        font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
+        overflow: hidden;
+        position: relative;
+        margin: 28px;
+      "
+    >
+      <div
+        style="
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+          margin-bottom: 34px;
+        "
+      >
+        2026-06-05 / MakerJackie
+      </div>
+      <h1
+        style="
+          font-size: 58px;
+          line-height: 1.12;
+          font-weight: 900;
+          letter-spacing: 0;
+          margin: 0 0 34px;
+        "
+      >
+        我把个人博客做成了一个可以被 AI 创建的网站
+      </h1>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        今天我在搞一件很小但很让我兴奋的事。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        我把一个个人博客，做成了可以被 AI 创建的网站。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        它已经超过临时页面 demo。它是真正有后台、有文章、有评论、有登录、有
+        RSS、有站点地图、有图片存储、有部署流程的博客。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        项目叫 01mvp-blog-starter。
+      </p>
+      <div
+        style="
+          position: absolute;
+          right: 76px;
+          bottom: 54px;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+        "
+      >
+        1/23
+      </div>
+    </section>
+    <section
+      class="slide"
+      style="
+        width: 1080px;
+        height: 1350px;
+        box-sizing: border-box;
+        padding: 74px 76px;
+        background: #fff;
+        border: 3px solid #111;
+        color: #111;
+        font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
+        overflow: hidden;
+        position: relative;
+        margin: 28px;
+      "
+    >
+      <div
+        style="
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+          margin-bottom: 34px;
+        "
+      >
+        2026-06-05 / MakerJackie
+      </div>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        它现在的目标很具体，给你一个 Cloudflare 上能跑的个人博客模板，然后让 AI 按文档或
+        Skill，把初始化、部署、资源创建这些麻烦活尽量都做掉。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        你只需要准备 Cloudflare 账号，准备 Codex，安装 Cloudflare 插件，clone 或 fork 这个仓库。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        后面交给 AI。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        说实话，这件事听起来没有那么性感。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        它不像一个新的 AI 视频模型，也不像一个一键生成 App 的工具。它只是一个博客。
+      </p>
+      <div
+        style="
+          position: absolute;
+          right: 76px;
+          bottom: 54px;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+        "
+      >
+        2/23
+      </div>
+    </section>
+    <section
+      class="slide"
+      style="
+        width: 1080px;
+        height: 1350px;
+        box-sizing: border-box;
+        padding: 74px 76px;
+        background: #fff;
+        border: 3px solid #111;
+        color: #111;
+        font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
+        overflow: hidden;
+        position: relative;
+        margin: 28px;
+      "
+    >
+      <div
+        style="
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+          margin-bottom: 34px;
+        "
+      >
+        2026-06-05 / MakerJackie
+      </div>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        但我最近越来越觉得，博客这玩意可能又要重要起来了。
+      </p>
+      <h2
+        style="
+          font-size: 44px;
+          line-height: 1.2;
+          font-weight: 900;
+          letter-spacing: 0;
+          margin: 34px 0 22px;
+          border-top: 3px solid #111;
+          padding-top: 22px;
+        "
+      >
+        我为什么又回到博客
+      </h2>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        过去几年，我们把太多内容放在平台里了。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        公众号、小红书、X、知乎、B 站，每个平台都有自己的流量规则、排版规则、推荐机制。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        这些平台当然很重要。我自己也会继续发。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        但平台账号很难成为一个真正属于你的家。
+      </p>
+      <div
+        style="
+          position: absolute;
+          right: 76px;
+          bottom: 54px;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+        "
+      >
+        3/23
+      </div>
+    </section>
+    <section
+      class="slide"
+      style="
+        width: 1080px;
+        height: 1350px;
+        box-sizing: border-box;
+        padding: 74px 76px;
+        background: #fff;
+        border: 3px solid #111;
+        color: #111;
+        font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
+        overflow: hidden;
+        position: relative;
+        margin: 28px;
+      "
+    >
+      <div
+        style="
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+          margin-bottom: 34px;
+        "
+      >
+        2026-06-05 / MakerJackie
+      </div>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        你写过的内容，最后都散在不同平台里。你的文章入口、读者关系、搜索流量、链接结构，都被平台托管着。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        所以我一直有个很朴素的想法。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        我希望自己有一个地方，可以放所有东西。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        文章、教程、项目记录、踩坑、产品日志、一些还没想明白的想法。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        这个地方不需要多华丽，但它要长期存在。它要能被搜索。它要有自己的域名。它要能被我自己控制。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        以前做这个事很烦。
+      </p>
+      <div
+        style="
+          position: absolute;
+          right: 76px;
+          bottom: 54px;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+        "
+      >
+        4/23
+      </div>
+    </section>
+    <section
+      class="slide"
+      style="
+        width: 1080px;
+        height: 1350px;
+        box-sizing: border-box;
+        padding: 74px 76px;
+        background: #fff;
+        border: 3px solid #111;
+        color: #111;
+        font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
+        overflow: hidden;
+        position: relative;
+        margin: 28px;
+      "
+    >
+      <div
+        style="
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+          margin-bottom: 34px;
+        "
+      >
+        2026-06-05 / MakerJackie
+      </div>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        你要选框架，要搞服务器，要配数据库，要做登录，要处理图片，要折腾部署。你如果想认真一点，还要做评论、邮件通知、RSS、SEO、导入导出。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        很多人卡住，原因很直接。第一步太麻烦了。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        AI 出现以后，我觉得这个第一步应该被重新设计。
+      </p>
+      <h2
+        style="
+          font-size: 44px;
+          line-height: 1.2;
+          font-weight: 900;
+          letter-spacing: 0;
+          margin: 34px 0 22px;
+          border-top: 3px solid #111;
+          padding-top: 22px;
+        "
+      >
+        我一开始做的是 Skill
+      </h2>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        最早我做 01mvp-blog-starter 的时候，有一个 01mvp-blog Skill。
+      </p>
+      <div
+        style="
+          position: absolute;
+          right: 76px;
+          bottom: 54px;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+        "
+      >
+        5/23
+      </div>
+    </section>
+    <section
+      class="slide"
+      style="
+        width: 1080px;
+        height: 1350px;
+        box-sizing: border-box;
+        padding: 74px 76px;
+        background: #fff;
+        border: 3px solid #111;
+        color: #111;
+        font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
+        overflow: hidden;
+        position: relative;
+        margin: 28px;
+      "
+    >
+      <div
+        style="
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+          margin-bottom: 34px;
+        "
+      >
+        2026-06-05 / MakerJackie
+      </div>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        你把 Skill 安装到 Codex 里，它会指导 AI 怎么从这个模板创建你的博客。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        这条路很合理。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        因为 Skill 可以更新。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        今天 Cloudflare 命令变了，明天初始化流程变了，后天模板目录调整了，我可以更新
+        Skill。用户下次使用时，就能拿到新的流程。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        但我后来发现一个问题。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        新手要先安装 Skill，这件事本身也有门槛。
+      </p>
+      <div
+        style="
+          position: absolute;
+          right: 76px;
+          bottom: 54px;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+        "
+      >
+        6/23
+      </div>
+    </section>
+    <section
+      class="slide"
+      style="
+        width: 1080px;
+        height: 1350px;
+        box-sizing: border-box;
+        padding: 74px 76px;
+        background: #fff;
+        border: 3px solid #111;
+        color: #111;
+        font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
+        overflow: hidden;
+        position: relative;
+        margin: 28px;
+      "
+    >
+      <div
+        style="
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+          margin-bottom: 34px;
+        "
+      >
+        2026-06-05 / MakerJackie
+      </div>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        如果一个人只是想试试，想看看 AI 能不能帮自己搭一个博客，他可能不想先研究 Skill 怎么安装。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        所以我现在把流程拆成两条。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        推荐方式，安装 01mvp-blog Skill。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        备用方式，直接复制文档里的 Prompt 给 AI。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        你可以把它理解成，一个是长期维护版，一个是马上体验版。
+      </p>
+      <div
+        style="
+          position: absolute;
+          right: 76px;
+          bottom: 54px;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+        "
+      >
+        7/23
+      </div>
+    </section>
+    <section
+      class="slide"
+      style="
+        width: 1080px;
+        height: 1350px;
+        box-sizing: border-box;
+        padding: 74px 76px;
+        background: #fff;
+        border: 3px solid #111;
+        color: #111;
+        font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
+        overflow: hidden;
+        position: relative;
+        margin: 28px;
+      "
+    >
+      <div
+        style="
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+          margin-bottom: 34px;
+        "
+      >
+        2026-06-05 / MakerJackie
+      </div>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        两种方式做的事一样，都是让 AI 接管初始化。
+      </p>
+      <h2
+        style="
+          font-size: 44px;
+          line-height: 1.2;
+          font-weight: 900;
+          letter-spacing: 0;
+          margin: 34px 0 22px;
+          border-top: 3px solid #111;
+          padding-top: 22px;
+        "
+      >
+        AI 到底会帮你做什么
+      </h2>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        很多人说 AI 会写代码，但真正难的是把项目落地。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        一个真实博客要上线，里面有很多碎活。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        AI 要 clone 仓库，要装依赖，要创建 Cloudflare D1 数据库，要创建 KV，要按需创建 R2，要写
+        Wrangler 配置，要跑数据库迁移，要部署 Worker，要检查首页、文章页、后台、RSS、站点地图。
+      </p>
+      <div
+        style="
+          position: absolute;
+          right: 76px;
+          bottom: 54px;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+        "
+      >
+        8/23
+      </div>
+    </section>
+    <section
+      class="slide"
+      style="
+        width: 1080px;
+        height: 1350px;
+        box-sizing: border-box;
+        padding: 74px 76px;
+        background: #fff;
+        border: 3px solid #111;
+        color: #111;
+        font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
+        overflow: hidden;
+        position: relative;
+        margin: 28px;
+      "
+    >
+      <div
+        style="
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+          margin-bottom: 34px;
+        "
+      >
+        2026-06-05 / MakerJackie
+      </div>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        如果你要绑定域名，它还要处理 DNS 记录和 Worker custom domain。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        这些事情人当然也能做。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        但对新手来说，每一步都有可能卡住。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        你不知道 D1 是什么。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        你不知道 KV 是什么。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        你不知道 R2 为什么要绑定付款方式。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        你不知道 `*.workers.dev` 在中国大陆很多网络环境里可能打不开。
+      </p>
+      <div
+        style="
+          position: absolute;
+          right: 76px;
+          bottom: 54px;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+        "
+      >
+        9/23
+      </div>
+    </section>
+    <section
+      class="slide"
+      style="
+        width: 1080px;
+        height: 1350px;
+        box-sizing: border-box;
+        padding: 74px 76px;
+        background: #fff;
+        border: 3px solid #111;
+        color: #111;
+        font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
+        overflow: hidden;
+        position: relative;
+        margin: 28px;
+      "
+    >
+      <div
+        style="
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+          margin-bottom: 34px;
+        "
+      >
+        2026-06-05 / MakerJackie
+      </div>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        你也不知道邮件功能为什么现在会牵扯到 Workers Paid。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        所以我希望这个项目把这些信息都写进文档和 Skill 里。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        AI 可以自动完成的，就让 AI 去做。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        AI 不能替你做的，就清楚告诉你。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        比如 Cloudflare 登录、账号注册、域名购买、nameserver 切换、付款方式确认、OAuth
+        应用创建、邮件验证，这些都需要你自己处理。
+      </p>
+      <div
+        style="
+          position: absolute;
+          right: 76px;
+          bottom: 54px;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+        "
+      >
+        10/23
+      </div>
+    </section>
+    <section
+      class="slide"
+      style="
+        width: 1080px;
+        height: 1350px;
+        box-sizing: border-box;
+        padding: 74px 76px;
+        background: #fff;
+        border: 3px solid #111;
+        color: #111;
+        font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
+        overflow: hidden;
+        position: relative;
+        margin: 28px;
+      "
+    >
+      <div
+        style="
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+          margin-bottom: 34px;
+        "
+      >
+        2026-06-05 / MakerJackie
+      </div>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        这件事要讲清楚。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        不然新手很容易以为 AI
+        能包办一切，跑到一半突然被浏览器登录、付款方式、域名设置拦住，然后就放弃了。
+      </p>
+      <h2
+        style="
+          font-size: 44px;
+          line-height: 1.2;
+          font-weight: 900;
+          letter-spacing: 0;
+          margin: 34px 0 22px;
+          border-top: 3px solid #111;
+          padding-top: 22px;
+        "
+      >
+        为什么选 Cloudflare
+      </h2>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        这个模板基本围绕 Cloudflare 来做。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        Worker 负责运行网站。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        D1 存文章、评论、账号和后台数据。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        KV 做缓存。
+      </p>
+      <div
+        style="
+          position: absolute;
+          right: 76px;
+          bottom: 54px;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+        "
+      >
+        11/23
+      </div>
+    </section>
+    <section
+      class="slide"
+      style="
+        width: 1080px;
+        height: 1350px;
+        box-sizing: border-box;
+        padding: 74px 76px;
+        background: #fff;
+        border: 3px solid #111;
+        color: #111;
+        font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
+        overflow: hidden;
+        position: relative;
+        margin: 28px;
+      "
+    >
+      <div
+        style="
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+          margin-bottom: 34px;
+        "
+      >
+        2026-06-05 / MakerJackie
+      </div>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        R2 放图片、导入包、导出包和备份。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        Email Service 负责邮件，不过现在先放在进阶功能里。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        这套组合对个人博客挺合适。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        你不用维护服务器，也不用自己装数据库。部署命令清楚，资源边界清楚，AI 也比较容易理解。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        更重要的是，Cloudflare 这些资源可以通过 Wrangler 和 API 自动化创建。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        这对 AI 很关键。
+      </p>
+      <div
+        style="
+          position: absolute;
+          right: 76px;
+          bottom: 54px;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+        "
+      >
+        12/23
+      </div>
+    </section>
+    <section
+      class="slide"
+      style="
+        width: 1080px;
+        height: 1350px;
+        box-sizing: border-box;
+        padding: 74px 76px;
+        background: #fff;
+        border: 3px solid #111;
+        color: #111;
+        font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
+        overflow: hidden;
+        position: relative;
+        margin: 28px;
+      "
+    >
+      <div
+        style="
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+          margin-bottom: 34px;
+        "
+      >
+        2026-06-05 / MakerJackie
+      </div>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        如果一个模板每一步都要人去后台点点点，AI 的价值会被打折。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        我希望 AI 能真的参与创建过程，而不只是写一段代码给你看。
+      </p>
+      <h2
+        style="
+          font-size: 44px;
+          line-height: 1.2;
+          font-weight: 900;
+          letter-spacing: 0;
+          margin: 34px 0 22px;
+          border-top: 3px solid #111;
+          padding-top: 22px;
+        "
+      >
+        这个项目现在长什么样
+      </h2>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        01mvp-blog-starter 现在已经远远超过一个首页。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        它有文章列表、文章详情、标签、系列、文档、关于页。
+      </p>
+      <div
+        style="
+          position: absolute;
+          right: 76px;
+          bottom: 54px;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+        "
+      >
+        13/23
+      </div>
+    </section>
+    <section
+      class="slide"
+      style="
+        width: 1080px;
+        height: 1350px;
+        box-sizing: border-box;
+        padding: 74px 76px;
+        background: #fff;
+        border: 3px solid #111;
+        color: #111;
+        font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
+        overflow: hidden;
+        position: relative;
+        margin: 28px;
+      "
+    >
+      <div
+        style="
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+          margin-bottom: 34px;
+        "
+      >
+        2026-06-05 / MakerJackie
+      </div>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        后台里可以写文章、管理评论、管理用户、管理站点设置、导入导出内容、上传资源。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        它有读者账号，也有管理员入口。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        它支持 RSS 和站点地图。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        它也给新手准备了中文文档和英文文档。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        这次我重点补了一篇 AI setup 文档。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        这篇文档会告诉你两种方式，装 Skill，或者复制 Prompt。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        文档里还会把一些容易踩坑的点写清楚。
+      </p>
+      <div
+        style="
+          position: absolute;
+          right: 76px;
+          bottom: 54px;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+        "
+      >
+        14/23
+      </div>
+    </section>
+    <section
+      class="slide"
+      style="
+        width: 1080px;
+        height: 1350px;
+        box-sizing: border-box;
+        padding: 74px 76px;
+        background: #fff;
+        border: 3px solid #111;
+        color: #111;
+        font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
+        overflow: hidden;
+        position: relative;
+        margin: 28px;
+      "
+    >
+      <div
+        style="
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+          margin-bottom: 34px;
+        "
+      >
+        2026-06-05 / MakerJackie
+      </div>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        自定义域名是可选的，但如果面向中国大陆读者，我建议准备自己的域名。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        R2 有免费额度，但通常需要绑定付款方式才能开通。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        邮件功能目前需要 Workers
+        Paid，不开也能先跑博客，只是邮件验证码、密码重置、评论回复通知这些功能先关掉。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        GitHub 登录、Google 登录、API Token 都是进阶功能，不需要第一天全配完。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        先让博客跑起来。
+      </p>
+      <div
+        style="
+          position: absolute;
+          right: 76px;
+          bottom: 54px;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+        "
+      >
+        15/23
+      </div>
+    </section>
+    <section
+      class="slide"
+      style="
+        width: 1080px;
+        height: 1350px;
+        box-sizing: border-box;
+        padding: 74px 76px;
+        background: #fff;
+        border: 3px solid #111;
+        color: #111;
+        font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
+        overflow: hidden;
+        position: relative;
+        margin: 28px;
+      "
+    >
+      <div
+        style="
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+          margin-bottom: 34px;
+        "
+      >
+        2026-06-05 / MakerJackie
+      </div>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        这句话我很想反复说。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        因为很多人做产品，第一天就想把所有功能配齐，然后被复杂度拖住。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        个人博客不需要这样。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        能打开首页，能进后台，能写第一篇文章，能部署到一个 URL 上，这就已经很棒了。
+      </p>
+      <h2
+        style="
+          font-size: 44px;
+          line-height: 1.2;
+          font-weight: 900;
+          letter-spacing: 0;
+          margin: 34px 0 22px;
+          border-top: 3px solid #111;
+          padding-top: 22px;
+        "
+      >
+        我会先拿自己的博客试
+      </h2>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        我接下来会把自己的博客当成第一个真实用户。
+      </p>
+      <div
+        style="
+          position: absolute;
+          right: 76px;
+          bottom: 54px;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+        "
+      >
+        16/23
+      </div>
+    </section>
+    <section
+      class="slide"
+      style="
+        width: 1080px;
+        height: 1350px;
+        box-sizing: border-box;
+        padding: 74px 76px;
+        background: #fff;
+        border: 3px solid #111;
+        color: #111;
+        font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
+        overflow: hidden;
+        position: relative;
+        margin: 28px;
+      "
+    >
+      <div
+        style="
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+          margin-bottom: 34px;
+        "
+      >
+        2026-06-05 / MakerJackie
+      </div>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        计划是先用 `new.makerjackie.com` 跑新站。老的 `makerjackie.com`
+        先保留，等迁移、文章、域名、访问都确认没问题，再决定正式切换。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        这一步对我来说很重要。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        如果我自己都不用，那这个项目就很虚。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        只有我自己真的迁移，真的用 Skill 创建，真的把旧文章搬过去，真的遇到问题再修
+        Skill，这个模板才会慢慢变可靠。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        我不想做一个只在 README 里看起来不错的项目。
+      </p>
+      <div
+        style="
+          position: absolute;
+          right: 76px;
+          bottom: 54px;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+        "
+      >
+        17/23
+      </div>
+    </section>
+    <section
+      class="slide"
+      style="
+        width: 1080px;
+        height: 1350px;
+        box-sizing: border-box;
+        padding: 74px 76px;
+        background: #fff;
+        border: 3px solid #111;
+        color: #111;
+        font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
+        overflow: hidden;
+        position: relative;
+        margin: 28px;
+      "
+    >
+      <div
+        style="
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+          margin-bottom: 34px;
+        "
+      >
+        2026-06-05 / MakerJackie
+      </div>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        我想做一个普通人真的能跟着跑起来的项目。
+      </p>
+      <h2
+        style="
+          font-size: 44px;
+          line-height: 1.2;
+          font-weight: 900;
+          letter-spacing: 0;
+          margin: 34px 0 22px;
+          border-top: 3px solid #111;
+          padding-top: 22px;
+        "
+      >
+        给想试的朋友
+      </h2>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        如果你想试，路径很简单。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        打开 GitHub：
+      </p>
+      <pre
+        style="
+          font-size: 28px;
+          line-height: 1.45;
+          margin: 18px 0 22px;
+          padding: 18px;
+          border: 2px solid #111;
+          background: #f7f7f7;
+          white-space: pre-wrap;
+        "
+      >
+https://github.com/01mvp/blog-starter</pre
+      >
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        准备一个 Cloudflare 账号。
+      </p>
+      <div
+        style="
+          position: absolute;
+          right: 76px;
+          bottom: 54px;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+        "
+      >
+        18/23
+      </div>
+    </section>
+    <section
+      class="slide"
+      style="
+        width: 1080px;
+        height: 1350px;
+        box-sizing: border-box;
+        padding: 74px 76px;
+        background: #fff;
+        border: 3px solid #111;
+        color: #111;
+        font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
+        overflow: hidden;
+        position: relative;
+        margin: 28px;
+      "
+    >
+      <div
+        style="
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+          margin-bottom: 34px;
+        "
+      >
+        2026-06-05 / MakerJackie
+      </div>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        在 Codex 里安装 Cloudflare 插件。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        然后二选一。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        安装 01mvp-blog Skill，或者打开 AI setup 文档，把 Prompt 复制给 Codex。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        中文文档：
+      </p>
+      <pre
+        style="
+          font-size: 28px;
+          line-height: 1.45;
+          margin: 18px 0 22px;
+          padding: 18px;
+          border: 2px solid #111;
+          background: #f7f7f7;
+          white-space: pre-wrap;
+        "
+      >
+https://blog.01mvp.com/zh/docs/ai-setup</pre
+      >
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        英文文档：
+      </p>
+      <div
+        style="
+          position: absolute;
+          right: 76px;
+          bottom: 54px;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+        "
+      >
+        19/23
+      </div>
+    </section>
+    <section
+      class="slide"
+      style="
+        width: 1080px;
+        height: 1350px;
+        box-sizing: border-box;
+        padding: 74px 76px;
+        background: #fff;
+        border: 3px solid #111;
+        color: #111;
+        font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
+        overflow: hidden;
+        position: relative;
+        margin: 28px;
+      "
+    >
+      <div
+        style="
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+          margin-bottom: 34px;
+        "
+      >
+        2026-06-05 / MakerJackie
+      </div>
+      <pre
+        style="
+          font-size: 28px;
+          line-height: 1.45;
+          margin: 18px 0 22px;
+          padding: 18px;
+          border: 2px solid #111;
+          background: #f7f7f7;
+          white-space: pre-wrap;
+        "
+      >
+https://blog.01mvp.com/docs/ai-setup</pre
+      >
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        你不需要一开始就懂所有技术名词。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        D1 可以先理解成博客数据库。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        KV 可以先理解成缓存。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        R2 可以先理解成图片和备份仓库。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        Worker 可以先理解成运行网站的地方。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        这些理解不够严谨，但足够你迈出第一步。
+      </p>
+      <div
+        style="
+          position: absolute;
+          right: 76px;
+          bottom: 54px;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+        "
+      >
+        20/23
+      </div>
+    </section>
+    <section
+      class="slide"
+      style="
+        width: 1080px;
+        height: 1350px;
+        box-sizing: border-box;
+        padding: 74px 76px;
+        background: #fff;
+        border: 3px solid #111;
+        color: #111;
+        font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
+        overflow: hidden;
+        position: relative;
+        margin: 28px;
+      "
+    >
+      <div
+        style="
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+          margin-bottom: 34px;
+        "
+      >
+        2026-06-05 / MakerJackie
+      </div>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        后面你真的跑起来了，再慢慢补概念也来得及。
+      </p>
+      <h2
+        style="
+          font-size: 44px;
+          line-height: 1.2;
+          font-weight: 900;
+          letter-spacing: 0;
+          margin: 34px 0 22px;
+          border-top: 3px solid #111;
+          padding-top: 22px;
+        "
+      >
+        我真正想做的事
+      </h2>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        我做 01mvp-blog-starter，不打算把大家都推成程序员。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        我更希望它能降低一个小门槛。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        让一个想写东西的人，有机会拥有自己的站点。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        让一个想学 AI 编程的人，有机会跑通一个真实项目。
+      </p>
+      <div
+        style="
+          position: absolute;
+          right: 76px;
+          bottom: 54px;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+        "
+      >
+        21/23
+      </div>
+    </section>
+    <section
+      class="slide"
+      style="
+        width: 1080px;
+        height: 1350px;
+        box-sizing: border-box;
+        padding: 74px 76px;
+        background: #fff;
+        border: 3px solid #111;
+        color: #111;
+        font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
+        overflow: hidden;
+        position: relative;
+        margin: 28px;
+      "
+    >
+      <div
+        style="
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+          margin-bottom: 34px;
+        "
+      >
+        2026-06-05 / MakerJackie
+      </div>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        让一个产品经理、设计师、运营、自媒体人，能亲手体验从模板到部署的完整过程。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        AI 时代很容易让人焦虑。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        每天都有新模型、新工具、新论文、新 demo。看久了，人会觉得自己永远追不上。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        但我觉得更好的方式，是做一个很小的东西。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        不用太大。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        一个博客就够。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        你把它跑起来，写一篇文章，发到自己的域名上。
+      </p>
+      <div
+        style="
+          position: absolute;
+          right: 76px;
+          bottom: 54px;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+        "
+      >
+        22/23
+      </div>
+    </section>
+    <section
+      class="slide"
+      style="
+        width: 1080px;
+        height: 1350px;
+        box-sizing: border-box;
+        padding: 74px 76px;
+        background: #fff;
+        border: 3px solid #111;
+        color: #111;
+        font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;
+        overflow: hidden;
+        position: relative;
+        margin: 28px;
+      "
+    >
+      <div
+        style="
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+          margin-bottom: 34px;
+        "
+      >
+        2026-06-05 / MakerJackie
+      </div>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        然后你会发现，AI 不再是一个挂在天上的概念。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        它开始变成你手里的工具。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        这件事挺重要的。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        因为很多时候，我们并不缺宏大的未来。
+      </p>
+      <p style="font-size: 34px; line-height: 1.5; letter-spacing: 0; margin: 0 0 20px">
+        我们缺的是今天晚上能完成的一小步。
+      </p>
+      <div
+        style="
+          position: absolute;
+          right: 76px;
+          bottom: 54px;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 22px;
+          font-weight: 800;
+        "
+      >
+        23/23
+      </div>
+    </section>
+  </body>
+</html>

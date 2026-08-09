@@ -1,0 +1,86 @@
+{
+  "name": "01mvp-blog-starter",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vp run --recursive build",
+    "build:web": "vp run web#build",
+    "db:migrate:remote": "pnpm --filter @repo/web exec wrangler d1 migrations apply CMS_DB --remote --config wrangler.jsonc",
+    "dev": "pnpm run --recursive --parallel dev",
+    "dev:web": "vp run --filter=@repo/web dev",
+    "deploy": "pnpm run deploy:web",
+    "deploy:web": "node scripts/check-r2-buckets.mjs && pnpm build:web && pnpm run db:migrate:remote && pnpm --filter @repo/web exec wrangler deploy --config dist/server/wrangler.json && node scripts/sync-obsidian.mjs --if-configured",
+    "lint": "vp lint --type-aware --type-check",
+    "lint:fix": "vp lint --type-aware --type-check --fix",
+    "format": "vp fmt",
+    "format:check": "vp fmt --check",
+    "check": "vp check",
+    "check:fix": "vp check --fix",
+    "test": "vp test",
+    "test:watch": "vp test --watch",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:all": "pnpm test && pnpm test:e2e",
+    "prepare": "vp config",
+    "deps": "vpx taze@latest -Ilwr --maturity-period 3",
+    "deps:major": "vpx taze@latest major -Ilwr --maturity-period 3",
+    "tanstack": "vpx @tanstack/cli@latest",
+    "sync:obsidian": "node scripts/sync-obsidian.mjs",
+    "db": "vp run --filter=@repo/db db",
+    "db:seed:local-admin": "node scripts/seed-local-admin.mjs",
+    "ui": "vp run --filter=@repo/ui ui",
+    "ui:web": "vp run --filter=@repo/web ui",
+    "auth:secret": "vpx auth@latest secret",
+    "skills": "vpx skills@latest",
+    "intent": "vpx @tanstack/intent@latest"
+  },
+  "devDependencies": {
+    "@playwright/test": "catalog:",
+    "@tanstack/eslint-plugin-query": "catalog:",
+    "@tanstack/eslint-plugin-router": "catalog:",
+    "eslint-plugin-react-hooks": "catalog:",
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@11.2.2",
+  "cloudflare": {
+    "bindings": {
+      "BETTER_AUTH_SECRET": {
+        "description": "Generate with `pnpm auth:secret`. Required for admin and reader sessions."
+      },
+      "CMS_CACHE": {
+        "description": "KV namespace for cache metadata and short-lived records."
+      },
+      "CMS_DB": {
+        "description": "D1 database for posts, comments, settings, users, sessions, and API tokens."
+      },
+      "CMS_EMAIL": {
+        "description": "Optional Cloudflare Email Service binding for outbound notifications and password reset email."
+      },
+      "CMS_EMAIL_FROM": {
+        "description": "Verified sender address used by the optional outbound email path."
+      },
+      "CMS_EMAIL_TO": {
+        "description": "Default recipient for admin notifications when an email does not provide a more specific recipient."
+      },
+      "CMS_STORAGE": {
+        "description": "R2 bucket for uploaded assets, import packages, exports, and backups."
+      },
+      "GITHUB_CLIENT_ID": {
+        "description": "Optional GitHub OAuth client id for account and comment login. Leave empty if GitHub login is disabled."
+      },
+      "GITHUB_CLIENT_SECRET": {
+        "description": "Optional GitHub OAuth secret for account and comment login. Leave empty if GitHub login is disabled."
+      },
+      "GOOGLE_CLIENT_ID": {
+        "description": "Optional Google OAuth client id for account and comment login. Leave empty if Google login is disabled."
+      },
+      "GOOGLE_CLIENT_SECRET": {
+        "description": "Optional Google OAuth secret for account and comment login. Leave empty if Google login is disabled."
+      }
+    }
+  }
+}

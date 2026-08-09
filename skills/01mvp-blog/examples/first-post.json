@@ -1,0 +1,30 @@
+{
+  "title": "Hello from the generated 01mvp-blog-starter site",
+  "slug": "hello-from-generated-01mvp-blog-starter",
+  "excerpt": "This post was created by the 01mvp-blog Skill during site initialization.",
+  "contentMarkdown": "# Hello from the generated 01mvp-blog-starter site\n\nThe 01mvp-blog Skill provisioned Cloudflare resources, deployed the Worker, wrote site settings, and published this bilingual post through the API.\n",
+  "status": "published",
+  "i18n": {
+    "title": {
+      "zh": "来自 Skill 生成站点的第一篇文章"
+    },
+    "excerpt": {
+      "zh": "这篇文章由 01mvp-blog Skill 在初始化流程中创建。"
+    },
+    "contentMarkdown": {
+      "zh": "# 来自 Skill 生成站点的第一篇文章\n\n01mvp-blog Skill 已创建 Cloudflare 资源、部署 Worker、写入站点设置，并通过 API 发布这篇双语文章。\n"
+    },
+    "contentHtml": {
+      "zh": "<h1>来自 Skill 生成站点的第一篇文章</h1><p>01mvp-blog Skill 已创建 Cloudflare 资源、部署 Worker、写入站点设置，并通过 API 发布这篇双语文章。</p>"
+    },
+    "contentText": {
+      "zh": "Skill 已创建 Cloudflare 资源、部署 Worker、写入站点设置，并通过 API 发布这篇双语文章。"
+    },
+    "seoTitle": {
+      "zh": "Skill 生成站点的第一篇文章"
+    },
+    "seoDescription": {
+      "zh": "01mvp-blog Skill 通过 API 创建的双语初始化文章。"
+    }
+  }
+}

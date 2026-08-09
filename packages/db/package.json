@@ -1,0 +1,27 @@
+{
+  "name": "@repo/db",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./cms": "./src/cms.ts",
+    "./schema": "./src/schema/index.ts",
+    "./schema/cms": "./src/schema/cms.sqlite.ts"
+  },
+  "scripts": {
+    "db": "drizzle-kit"
+  },
+  "dependencies": {
+    "drizzle-orm": "catalog:"
+  },
+  "devDependencies": {
+    "@repo/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "drizzle-kit": "catalog:",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "@tanstack/react-start": "catalog:"
+  }
+}

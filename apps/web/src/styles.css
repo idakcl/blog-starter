@@ -1,0 +1,270 @@
+@import "@repo/ui/styles/base.css";
+@import "fumadocs-ui/css/shadcn.css";
+@import "fumadocs-ui/css/preset.css";
+
+@source "./";
+
+@import "@fontsource-variable/inter";
+
+@theme inline {
+  --font-heading: var(--font-sans);
+  --font-sans: "Inter Variable", sans-serif;
+}
+
+@layer base {
+  [data-theme-preset] {
+    --color-fd-background: var(--background);
+    --color-fd-foreground: var(--foreground);
+    --color-fd-muted: var(--muted);
+    --color-fd-muted-foreground: var(--muted-foreground);
+    --color-fd-popover: var(--popover);
+    --color-fd-popover-foreground: var(--popover-foreground);
+    --color-fd-card: var(--card);
+    --color-fd-card-foreground: var(--card-foreground);
+    --color-fd-border: var(--border);
+    --color-fd-primary: var(--primary);
+    --color-fd-primary-foreground: var(--primary-foreground);
+    --color-fd-secondary: var(--secondary);
+    --color-fd-secondary-foreground: var(--secondary-foreground);
+    --color-fd-accent: var(--accent);
+    --color-fd-accent-foreground: var(--accent-foreground);
+    --color-fd-ring: var(--ring);
+  }
+}
+
+@layer components {
+  [data-docs-surface] .prose figure.shiki {
+    width: 100%;
+    max-width: 100%;
+    margin-block: 1.25rem;
+    border-color: color-mix(in oklch, var(--border), transparent 15%) !important;
+    border-radius: 0.5rem !important;
+    background-color: color-mix(in oklch, var(--muted), var(--background) 42%) !important;
+    box-shadow: none !important;
+  }
+
+  [data-docs-surface] .prose figure.shiki > div[role="region"] {
+    max-width: 100%;
+    max-height: min(34rem, 70vh);
+    scrollbar-gutter: stable;
+  }
+
+  [data-docs-surface] .prose figure.shiki pre {
+    padding-inline: 1rem 3rem;
+    line-height: 1.7;
+    tab-size: 2;
+  }
+
+  [data-docs-surface] .prose figure.shiki pre > code {
+    font-variant-ligatures: none;
+  }
+
+  [data-docs-surface] .prose figure.shiki pre:has(> code.language-txt) {
+    width: 100% !important;
+    min-width: 100% !important;
+    white-space: pre-wrap !important;
+  }
+
+  [data-docs-surface] .prose figure.shiki pre > code.language-txt {
+    white-space: pre-wrap !important;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  [data-docs-surface] .prose figure.shiki button {
+    background-color: color-mix(in oklch, var(--background), transparent 18%);
+    border-color: color-mix(in oklch, var(--border), transparent 20%);
+  }
+}
+
+@layer utilities {
+  [data-home-surface] {
+    --home-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  [data-home-hero]::before {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-image:
+      linear-gradient(
+        90deg,
+        color-mix(in oklch, var(--foreground), transparent 92%) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        180deg,
+        color-mix(in oklch, var(--foreground), transparent 92%) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        115deg,
+        transparent 0%,
+        color-mix(in oklch, var(--accent), var(--background) 22%) 34%,
+        transparent 68%
+      );
+    background-position:
+      0 0,
+      0 0,
+      -40% 50%;
+    background-size:
+      36px 36px,
+      36px 36px,
+      58% 140%;
+    content: "";
+    mask-image: linear-gradient(180deg, black 0%, black 62%, transparent 100%);
+    opacity: 0.42;
+    pointer-events: none;
+    animation: home-grid-drift 24s linear infinite;
+  }
+
+  [data-home-hero]::after {
+    position: absolute;
+    right: 0;
+    bottom: -1px;
+    left: 0;
+    z-index: 1;
+    height: 2px;
+    background: linear-gradient(
+      90deg,
+      var(--foreground),
+      color-mix(in oklch, var(--foreground), transparent 72%),
+      var(--foreground)
+    );
+    content: "";
+    pointer-events: none;
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: home-line-sweep 1.45s var(--home-ease) 0.15s forwards;
+  }
+
+  [data-home-reveal],
+  [data-home-card],
+  [data-home-row] {
+    --home-hover-x: 0px;
+    --home-hover-y: 0px;
+    --home-rise-y: 0px;
+    transform: translate3d(var(--home-hover-x), calc(var(--home-rise-y) + var(--home-hover-y)), 0);
+    transition:
+      opacity 720ms var(--home-ease) var(--home-reveal-delay, 0ms),
+      transform 720ms var(--home-ease) var(--home-reveal-delay, 0ms),
+      background-color 320ms var(--home-ease),
+      border-color 320ms var(--home-ease),
+      box-shadow 320ms var(--home-ease),
+      color 320ms var(--home-ease);
+  }
+
+  [data-home-motion-ready] [data-home-reveal]:not([data-home-reveal="visible"]) {
+    --home-rise-y: 22px;
+    opacity: 0;
+    will-change: opacity, transform;
+  }
+
+  [data-home-motion-ready] [data-home-reveal="visible"] {
+    --home-rise-y: 0px;
+    opacity: 1;
+  }
+
+  [data-home-hero] [data-home-reveal] {
+    --home-rise-y: 22px;
+    opacity: 0;
+    animation: home-reveal-in 860ms var(--home-ease) var(--home-reveal-delay, 0ms) forwards;
+  }
+
+  [data-home-card]:hover {
+    --home-hover-y: -4px;
+    border-color: color-mix(in oklch, var(--foreground), transparent 30%);
+    box-shadow: 0 20px 46px -34px color-mix(in oklch, var(--foreground), transparent 34%);
+  }
+
+  [data-home-row]:hover {
+    --home-hover-x: 6px;
+    background-color: color-mix(in oklch, var(--muted), transparent 44%);
+  }
+
+  [data-home-icon] {
+    transition:
+      color 320ms var(--home-ease),
+      background-color 320ms var(--home-ease),
+      transform 320ms var(--home-ease);
+  }
+
+  [data-home-card]:hover [data-home-icon],
+  [data-home-row]:hover [data-home-icon] {
+    color: var(--background);
+    background-color: var(--foreground);
+    transform: scale(1.06) rotate(-2deg);
+  }
+
+  [data-home-cover] img {
+    transition: transform 720ms var(--home-ease);
+  }
+
+  [data-home-cover]:hover img {
+    transform: scale(1.055);
+  }
+
+  @keyframes home-grid-drift {
+    0% {
+      background-position:
+        0 0,
+        0 0,
+        -40% 50%;
+    }
+    100% {
+      background-position:
+        36px 36px,
+        36px 36px,
+        140% 50%;
+    }
+  }
+
+  @keyframes home-line-sweep {
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  @keyframes home-reveal-in {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 22px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-home-hero]::before,
+    [data-home-hero]::after {
+      animation: none;
+    }
+
+    [data-home-hero]::after {
+      transform: none;
+    }
+
+    [data-home-reveal],
+    [data-home-card],
+    [data-home-row],
+    [data-home-icon],
+    [data-home-cover] img {
+      transition: none;
+    }
+
+    [data-home-reveal] {
+      --home-rise-y: 0px;
+      opacity: 1;
+      animation: none;
+    }
+  }
+
+  @media (scripting: none) {
+    [data-home-reveal] {
+      --home-rise-y: 0px;
+      opacity: 1;
+    }
+  }
+}
