@@ -87,6 +87,7 @@ type CloudflareBindings = {
   CMS_TURNSTILE_SECRET_KEY?: string;
   VITE_TURNSTILE_SITE_KEY: string;
   BETTER_AUTH_SECRET?: string;
+  BETTER_AUTH_TRUSTED_ORIGINS?: string;
   GITHUB_CLIENT_ID?: string;
   GITHUB_CLIENT_SECRET?: string;
   GOOGLE_CLIENT_ID?: string;

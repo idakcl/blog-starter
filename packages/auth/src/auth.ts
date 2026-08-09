@@ -11,6 +11,8 @@ export type BlogAuthEnv = {
   googleClientId?: string;
   googleClientSecret?: string;
   secret?: string;
+  /** Comma-separated extra origins to trust (e.g. a proxy/mirror domain the admin logs in from). */
+  trustedOrigins?: string;
 };
 
 const authSchema = {
@@ -28,7 +30,7 @@ export function createBlogAuth(database: AuthDatabase, env: BlogAuthEnv) {
 
   return betterAuth({
     baseURL,
-    trustedOrigins: getTrustedOrigins(baseURL),
+    trustedOrigins: getTrustedOrigins(baseURL, env.trustedOrigins),
     secret: resolveSecret(env.secret, baseURL),
     telemetry: {
       enabled: false,
@@ -141,19 +143,36 @@ function resolveSecret(secret: string | undefined, baseURL: string | undefined) 
   throw new Error("BETTER_AUTH_SECRET is required for Better Auth");
 }
 
-function getTrustedOrigins(baseURL: string | undefined) {
+function getTrustedOrigins(baseURL: string | undefined, extra?: string) {
+  const origins = new Set<string>();
   const origin = getBaseOrigin(baseURL);
 
-  if (!origin) {
-    return undefined;
+  if (origin) {
+    origins.add(origin);
+
+    if (isLocalBaseURL(baseURL)) {
+      origins.add("http://localhost:*");
+      origins.add("http://127.0.0.1:*");
+      origins.add("http://[::1]:*");
+    }
   }
 
-  const origins = new Set([origin]);
+  // Always trust our own domains (custom domain + workers.dev fallback), http & https,
+  // so login works regardless of which of our hostnames the admin actually opens.
+  for (const domain of ["nyc.mn", "workers.dev"]) {
+    origins.add(`https://*.${domain}`);
+    origins.add(`http://*.${domain}`);
+  }
 
-  if (isLocalBaseURL(baseURL)) {
-    origins.add("http://localhost:*");
-    origins.add("http://127.0.0.1:*");
-    origins.add("http://[::1]:*");
+  // Optional explicit origins (comma-separated) for proxied / mirror domains.
+  if (extra) {
+    for (const item of extra.split(",")) {
+      const trimmed = item.trim();
+
+      if (trimmed) {
+        origins.add(trimmed);
+      }
+    }
   }
 
   return [...origins];

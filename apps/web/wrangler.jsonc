@@ -13,6 +13,7 @@
   },
   "routes": [{ "pattern": "log.hello.nyc.mn", "custom_domain": true }],
   "vars": {
+    "BETTER_AUTH_TRUSTED_ORIGINS": "",
     "VITE_BASE_URL": "https://log.hello.nyc.mn",
     "CMS_PUBLIC_SITE_URL": "https://log.hello.nyc.mn",
     "CMS_BACKUP_RETENTION_DAYS": "30",

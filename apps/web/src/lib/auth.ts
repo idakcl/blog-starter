@@ -7,6 +7,7 @@ const database = env.CMS_DB as Parameters<typeof createAuthDb>[0];
 
 export const auth = createBlogAuth(createAuthDb(database), {
   baseURL: getAuthBaseURL(),
+  trustedOrigins: env.BETTER_AUTH_TRUSTED_ORIGINS,
   githubClientId: env.GITHUB_CLIENT_ID,
   githubClientSecret: env.GITHUB_CLIENT_SECRET,
   googleClientId: env.GOOGLE_CLIENT_ID,
