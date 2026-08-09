@@ -468,41 +468,45 @@ function buildPostI18n(
     return input.i18n;
   }
 
-  if (input.locale !== "zh") {
-    return post.i18n ?? null;
+  const next = { ...post.i18n };
+
+  // 正文随每次保存同步到 zh 本地化副本：否则编辑器保存（不带 locale=zh）只更新主字段，
+  // zh 页面会一直渲染陈旧的 i18n.zh.contentHtml，导致新增的视频等媒体无法显示。
+  if (normalized.contentMarkdown !== undefined) {
+    const html =
+      normalized.contentHtml ?? renderMarkdownToHtml(normalized.contentMarkdown);
+    const text =
+      normalized.contentHtml !== undefined
+        ? htmlToText(normalized.contentHtml)
+        : markdownToText(normalized.contentMarkdown);
+    next.contentMarkdown = { ...next.contentMarkdown, zh: normalized.contentMarkdown };
+    next.contentHtml = { ...next.contentHtml, zh: html };
+    next.contentText = { ...next.contentText, zh: text };
   }
 
-  const next = { ...post.i18n };
-  const setZh = <TField extends keyof NonNullable<Post["i18n"]>>(field: TField, value?: string) => {
-    if (value === undefined) {
-      return;
-    }
+  if (input.locale === "zh") {
+    const setZh = <TField extends keyof NonNullable<Post["i18n"]>>(
+      field: TField,
+      value?: string,
+    ) => {
+      if (value === undefined) {
+        return;
+      }
 
-    next[field] = {
-      ...next[field],
-      zh: value,
+      next[field] = {
+        ...next[field],
+        zh: value,
+      };
     };
-  };
 
-  const localizedHtml =
-    normalized.contentHtml ??
-    (normalized.contentMarkdown !== undefined
-      ? renderMarkdownToHtml(normalized.contentMarkdown)
-      : undefined);
-  const localizedText =
-    normalized.contentHtml !== undefined
-      ? htmlToText(normalized.contentHtml)
-      : normalized.contentMarkdown !== undefined
-        ? markdownToText(normalized.contentMarkdown)
-        : undefined;
-
-  setZh("title", normalized.title);
-  setZh("excerpt", normalized.excerpt);
-  setZh("contentMarkdown", normalized.contentMarkdown);
-  setZh("contentHtml", localizedHtml);
-  setZh("contentText", localizedText);
-  setZh("seoTitle", input.seoTitle?.trim() || normalized.title);
-  setZh("seoDescription", input.seoDescription?.trim() || normalized.excerpt || localizedText);
+    setZh("title", normalized.title);
+    setZh("excerpt", normalized.excerpt);
+    setZh("seoTitle", input.seoTitle?.trim() || normalized.title);
+    setZh(
+      "seoDescription",
+      input.seoDescription?.trim() || normalized.excerpt || next.contentText?.zh,
+    );
+  }
 
   return next;
 }
