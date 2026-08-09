@@ -135,7 +135,13 @@ function inlineMarkdown(value: string) {
     .replace(/`([^`]+)`/g, "<code>$1</code>")
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
     .replace(/\*([^*]+)\*/g, "<em>$1</em>")
-    .replace(/!\[([^\]]*)]\((https?:\/\/[^)\s]+|\/[^)\s]+)\)/g, '<img src="$2" alt="$1" />')
+    .replace(
+      /!\[([^\]]*)]\((https?:\/\/[^)\s]+|\/[^)\s]+)\)/g,
+      (substring: string, alt: string, url: string) =>
+        /\.(mp4|webm|ogg|ogv|mov|m4v|m3u8)(\?|#|$)/i.test(url)
+          ? `<video src="${url}" controls preload="metadata"></video>`
+          : `<img src="${url}" alt="${alt}" />`,
+    )
     .replace(
       /(?<!!)\[([^\]]+)]\((https?:\/\/[^)\s]+|\/[^)\s]+)\)/g,
       '<a href="$2" rel="noreferrer">$1</a>',

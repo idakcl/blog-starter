@@ -247,11 +247,7 @@ export function PostForm({
         continue;
       }
 
-      snippets.push(
-        item.contentType.startsWith("video/")
-          ? `<video src="${item.url}" controls preload="metadata"></video>`
-          : `![${item.name}](${item.url})`,
-      );
+      snippets.push(`![${item.name}](${item.url})`);
     }
 
     if (snippets.length > 0) {
