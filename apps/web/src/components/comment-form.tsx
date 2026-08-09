@@ -108,7 +108,7 @@ export function CommentForm({
 
       if (!response.ok) {
         setState("error");
-        const errorBody = await response.json().catch(() => ({})) as { error?: string };
+        const errorBody = (await response.json().catch(() => ({}))) as { error?: string };
         setErrorMessage(ERROR_MESSAGES[response.status] || errorBody.error || "评论提交失败");
         return;
       }
@@ -196,7 +196,11 @@ export function CommentForm({
   }
 
   if (!user) {
-    return <GuestCommentForm {...{ onCancelReply, onCommentCreated, parentId, postSlug, replyingTo, turnstileSiteKey }} />;
+    return (
+      <GuestCommentForm
+        {...{ onCancelReply, onCommentCreated, parentId, postSlug, replyingTo, turnstileSiteKey }}
+      />
+    );
   }
 
   return (
@@ -317,7 +321,9 @@ export function CommentForm({
             {submittedStatus === "approved" ? m.comment_success() : m.comment_pending_success()}
           </p>
         ) : null}
-        {state === "error" ? <p className="text-sm text-destructive">{errorMessage || m.comment_error()}</p> : null}
+        {state === "error" ? (
+          <p className="text-sm text-destructive">{errorMessage || m.comment_error()}</p>
+        ) : null}
       </div>
     </form>
   );
@@ -376,7 +382,7 @@ function GuestCommentForm({
 
       if (!response.ok) {
         setState("error");
-        const errorBody = await response.json().catch(() => ({})) as { error?: string };
+        const errorBody = (await response.json().catch(() => ({}))) as { error?: string };
         setErrorMessage(ERROR_MESSAGES[response.status] || errorBody.error || "评论提交失败");
         return;
       }
@@ -467,7 +473,9 @@ function GuestCommentForm({
             {submittedStatus === "approved" ? m.comment_success() : m.comment_pending_success()}
           </p>
         ) : null}
-        {state === "error" ? <p className="text-sm text-destructive">{errorMessage || m.comment_error()}</p> : null}
+        {state === "error" ? (
+          <p className="text-sm text-destructive">{errorMessage || m.comment_error()}</p>
+        ) : null}
       </div>
     </form>
   );

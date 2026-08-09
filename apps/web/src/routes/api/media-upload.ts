@@ -84,19 +84,14 @@ export const Route = createFileRoute("/api/media-upload")({
           }
 
           const payload = (await upstream.json().catch(() => null)) as
-            | Array<{ src?: string }>
-            | { src?: string }
-            | null;
+            Array<{ src?: string }> | { src?: string } | null;
           const entries = Array.isArray(payload) ? payload : payload ? [payload] : [];
           const uploaded = entries
             .map((entry) => normalizeUrl(base, entry?.src))
             .filter((url): url is string => Boolean(url));
 
           if (uploaded.length === 0) {
-            return jsonResponse(
-              { error: "Netpan returned no media URL." },
-              { status: 502 },
-            );
+            return jsonResponse({ error: "Netpan returned no media URL." }, { status: 502 });
           }
 
           const data = candidates.map((file, index) => ({

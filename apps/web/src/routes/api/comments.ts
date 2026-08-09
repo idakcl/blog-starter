@@ -53,7 +53,10 @@ export const Route = createFileRoute("/api/comments")({
 
         // Guest comments: require guestName when not logged in
         if (!user && !(body as Record<string, unknown>).guestName) {
-          return jsonResponse({ error: "A display name is required to comment as a guest" }, { status: 400 });
+          return jsonResponse(
+            { error: "A display name is required to comment as a guest" },
+            { status: 400 },
+          );
         }
 
         const turnstile = await verifyTurnstile({
@@ -74,7 +77,9 @@ export const Route = createFileRoute("/api/comments")({
           return jsonResponse({ error: rateLimit.error }, { status: 429 });
         }
 
-        const guestName = !user ? String((body as Record<string, unknown>).guestName || "Anonymous") : undefined;
+        const guestName = !user
+          ? String((body as Record<string, unknown>).guestName || "Anonymous")
+          : undefined;
         const commentInput = {
           postSlug: body.postSlug,
           authorUserId: user?.id ?? null,

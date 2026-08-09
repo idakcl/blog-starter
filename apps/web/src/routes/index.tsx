@@ -79,7 +79,9 @@ function HomePage() {
         <div className="mb-10">
           <h1 className="text-3xl font-semibold tracking-tight">{siteSettings.name}</h1>
           {siteSettings.authorBio ? (
-            <p className="mt-3 max-w-2xl text-muted-foreground leading-7">{siteSettings.authorBio}</p>
+            <p className="mt-3 max-w-2xl text-muted-foreground leading-7">
+              {siteSettings.authorBio}
+            </p>
           ) : null}
         </div>
 
@@ -98,7 +100,9 @@ function HomePage() {
                   </h3>
                 </Link>
                 {post.excerpt ? (
-                  <p className="mt-2 text-muted-foreground leading-relaxed line-clamp-2">{post.excerpt}</p>
+                  <p className="mt-2 text-muted-foreground leading-relaxed line-clamp-2">
+                    {post.excerpt}
+                  </p>
                 ) : null}
                 {post.tags.length ? (
                   <div className="mt-3 flex flex-wrap gap-2">
@@ -118,7 +122,9 @@ function HomePage() {
             ))}
           </div>
         ) : (
-          <p className="text-muted-foreground py-8 text-center">{m.no_posts_yet ? m.no_posts_yet() : "暂无文章"}</p>
+          <p className="text-muted-foreground py-8 text-center">
+            {m.no_posts_yet ? m.no_posts_yet() : "暂无文章"}
+          </p>
         )}
 
         {posts.length > 10 ? (
