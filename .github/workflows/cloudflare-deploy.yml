@@ -46,4 +46,6 @@ jobs:
           test -n "$CLOUDFLARE_API_TOKEN"
 
       - name: Deploy web app
+        env:
+          SKIP_R2_BUCKET_CHECK: "1"
         run: pnpm deploy:web
