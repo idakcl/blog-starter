@@ -19,6 +19,7 @@
     "CMS_EMAIL_TO": "",
     "CMS_PASSWORD_RESET_TTL_MINUTES": "30",
     "VITE_TURNSTILE_SITE_KEY": "",
+    "NETPAN_API_BASE": "https://netpan.1234.nyc.mn",
   },
   "d1_databases": [
     {
