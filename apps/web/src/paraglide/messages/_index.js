@@ -356,6 +356,7 @@ import { getLocale, experimentalStaticLocale } from "../runtime.js"
 /** @typedef {{}} UpdatedInputs */
 /** @typedef {{}} UploadInputs */
 /** @typedef {{}} View_All_PostsInputs */
+/** @typedef {{}} No_Posts_YetInputs */
 import * as __en from "./en.js"
 import * as __zh from "./zh.js"
 /**
@@ -5313,4 +5314,18 @@ export const view_all_posts = /** @type {((inputs?: View_All_PostsInputs, option
 	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
 	if (locale === "en") return __en.view_all_posts(inputs)
 	return __zh.view_all_posts(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "No posts yet." |
+*
+* @param {No_Posts_YetInputs} inputs
+* @param {{ locale?: "en" | "zh" }} options
+* @returns {LocalizedString}
+*/
+export const no_posts_yet = /** @type {((inputs?: No_Posts_YetInputs, options?: { locale?: "en" | "zh" }) => LocalizedString) & import('../runtime.js').MessageMetadata<No_Posts_YetInputs, { locale?: "en" | "zh" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.no_posts_yet(inputs)
+	return __zh.no_posts_yet(inputs)
 });

@@ -352,5 +352,6 @@
   "theme_toggle": "切换主题",
   "updated": "更新于",
   "upload": "上传",
-  "view_all_posts": "查看全部文章"
+  "view_all_posts": "查看全部文章",
+  "no_posts_yet": "暂无文章"
 }
