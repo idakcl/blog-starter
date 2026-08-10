@@ -4,14 +4,7 @@ import { getSiteSettingsForLocale, type SiteSettings } from "@repo/core";
 import { Button } from "@repo/ui/components/button";
 import { cn } from "@repo/ui/lib/utils";
 import { Link, useLocation } from "@tanstack/react-router";
-import {
-  BookOpenIcon,
-  FileTextIcon,
-  HomeIcon,
-  Loader2Icon,
-  SearchIcon,
-  UserCircleIcon,
-} from "lucide-react";
+import { FileTextIcon, HomeIcon, Loader2Icon, SearchIcon, UserCircleIcon } from "lucide-react";
 import { useEffect } from "react";
 
 import { LanguageToggle } from "#/components/language-toggle";
@@ -144,7 +137,6 @@ export function SiteShell({
 type ShellNavigationItem = SiteSettings["navigation"][number];
 
 const defaultMarketingNavigation: ShellNavigationItem[] = [
-  { label: "Demo", href: "/demo", i18n: { label: { zh: "博客 Demo" } } },
   { label: "Docs", href: "/docs", i18n: { label: { zh: "文档" } } },
   { label: "Articles", href: "/blog", i18n: { label: { zh: "文章" } } },
   { label: "About", href: "/about", i18n: { label: { zh: "关于" } } },
@@ -185,11 +177,6 @@ function MobileTabBar({ locale }: { readonly locale: ReturnType<typeof getCurren
       icon: HomeIcon,
     },
     {
-      href: "/demo",
-      label: locale === "zh" ? "Demo" : "Demo",
-      icon: BookOpenIcon,
-    },
-    {
       href: docsHref,
       label: locale === "zh" ? "文档" : "Docs",
       icon: FileTextIcon,
@@ -208,7 +195,7 @@ function MobileTabBar({ locale }: { readonly locale: ReturnType<typeof getCurren
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/95 px-2 pt-1.5 pb-[max(env(safe-area-inset-bottom),0.5rem)] shadow-[0_-12px_30px_rgba(0,0,0,0.08)] backdrop-blur-xl md:hidden">
-      <div className="mx-auto grid max-w-md grid-cols-5 gap-1">
+      <div className="mx-auto grid max-w-md grid-cols-4 gap-1">
         {items.map((item) => {
           const Icon = item.icon;
           const active = isActiveMobilePath(location.pathname, item.href);
