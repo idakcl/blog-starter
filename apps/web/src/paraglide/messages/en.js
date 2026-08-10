@@ -109,6 +109,9 @@
 /** @typedef {{}} Admin_Posts_Move_To_DraftInputs */
 /** @typedef {{}} Admin_Posts_No_SeriesInputs */
 /** @typedef {{}} Admin_Posts_Not_PublicInputs */
+/** @typedef {{}} Admin_Posts_Show_HiddenInputs */
+/** @typedef {{}} Admin_Posts_Show_In_ListInputs */
+/** @typedef {{}} Admin_Posts_Hidden_BadgeInputs */
 /** @typedef {{}} Admin_Posts_Public_UrlInputs */
 /** @typedef {{}} Admin_Posts_SearchInputs */
 /** @typedef {{}} Admin_Posts_Select_AllInputs */
@@ -790,6 +793,18 @@ export const admin_posts_no_series = /** @type {(inputs: Admin_Posts_No_SeriesIn
 
 export const admin_posts_not_public = /** @type {(inputs: Admin_Posts_Not_PublicInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Not public`)
+};
+
+export const admin_posts_show_hidden = /** @type {(inputs: Admin_Posts_Show_HiddenInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Hidden posts`)
+};
+
+export const admin_posts_show_in_list = /** @type {(inputs: Admin_Posts_Show_In_ListInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Show in list`)
+};
+
+export const admin_posts_hidden_badge = /** @type {(inputs: Admin_Posts_Hidden_BadgeInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Hidden`)
 };
 
 export const admin_posts_public_url = /** @type {(inputs: Admin_Posts_Public_UrlInputs) => LocalizedString} */ () => {

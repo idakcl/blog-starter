@@ -3,7 +3,15 @@ import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import { Link } from "@tanstack/react-router";
-import { ArchiveIcon, FileTextIcon, InfoIcon, SearchIcon, SendIcon } from "lucide-react";
+import {
+  ArchiveIcon,
+  EyeIcon,
+  EyeOffIcon,
+  FileTextIcon,
+  InfoIcon,
+  SearchIcon,
+  SendIcon,
+} from "lucide-react";
 
 import { AdminPanel, AdminTableFrame, adminSelectClassName } from "#/components/admin/admin-ui";
 import { PostBatchActions, type BatchAction } from "#/components/admin/post-batch-actions";
@@ -36,6 +44,10 @@ interface PostListProps {
   onChangePostStatus: (post: Post, status: ContentStatus) => void;
   onDeletePost: (post: Post) => void;
   onBatchAction: (action: BatchAction) => void;
+  hiddenFilter: boolean;
+  hiddenCount: number;
+  onHiddenFilterChange: (value: boolean) => void;
+  onShowInList: (post: Post) => void;
 }
 
 export function PostList({
@@ -57,6 +69,10 @@ export function PostList({
   onChangePostStatus,
   onDeletePost,
   onBatchAction,
+  hiddenFilter,
+  hiddenCount,
+  onHiddenFilterChange,
+  onShowInList,
 }: PostListProps) {
   const statusDetails = statusOptions
     .filter((status): status is Exclude<ContentStatus, "deleted"> => status !== "all")
@@ -130,6 +146,29 @@ export function PostList({
             </select>
           </div>
         </div>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <Button
+          type="button"
+          size="sm"
+          variant={hiddenFilter ? "default" : "outline"}
+          onClick={() => onHiddenFilterChange(!hiddenFilter)}
+          aria-pressed={hiddenFilter}
+        >
+          <EyeOffIcon />
+          {m.admin_posts_show_hidden()}
+          {hiddenCount > 0 ? (
+            <span className="ml-1 rounded-sm bg-background/20 px-1.5 py-0.5 text-[11px] font-semibold">
+              {hiddenCount}
+            </span>
+          ) : null}
+        </Button>
+        {hiddenFilter ? (
+          <span className="text-xs text-muted-foreground">
+            仅显示已从公开列表隐藏的文章；点“显示在列表”可让其重新公开。
+          </span>
+        ) : null}
       </div>
 
       <details className="mt-4 border-y border-border/80 py-3">
@@ -206,6 +245,11 @@ export function PostList({
                           ) : null}
                         </div>
                       ) : null}
+                      {!post.listed ? (
+                        <span className="rounded-sm border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-[11px] font-medium text-amber-600 dark:text-amber-400">
+                          {m.admin_posts_hidden_badge()}
+                        </span>
+                      ) : null}
                     </div>
                   </td>
                   <td className="px-3 py-3">
@@ -279,6 +323,12 @@ export function PostList({
                       {!isObsidianPost ? (
                         <Button size="sm" variant="destructive" onClick={() => onDeletePost(post)}>
                           {m.admin_posts_delete()}
+                        </Button>
+                      ) : null}
+                      {!isObsidianPost && !post.listed ? (
+                        <Button size="sm" variant="outline" onClick={() => onShowInList(post)}>
+                          <EyeIcon />
+                          {m.admin_posts_show_in_list()}
                         </Button>
                       ) : null}
                     </div>

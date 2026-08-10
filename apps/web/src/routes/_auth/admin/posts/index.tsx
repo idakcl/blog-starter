@@ -24,7 +24,10 @@ function AdminPostsPage() {
   const [statusFilter, setStatusFilter] = useState<"all" | ContentStatus>("all");
   const [seriesFilter, setSeriesFilter] = useState("all");
   const [tagFilter, setTagFilter] = useState("all");
+  const [hiddenFilter, setHiddenFilter] = useState(false);
   const [selectedPostIds, setSelectedPostIds] = useState<string[]>([]);
+
+  const hiddenCount = useMemo(() => rows.filter((post) => !post.listed).length, [rows]);
 
   const visiblePosts = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -34,6 +37,7 @@ function AdminPostsPage() {
         (statusFilter === "all" || post.status === statusFilter) &&
         (seriesFilter === "all" || post.series?.slug === seriesFilter) &&
         (tagFilter === "all" || post.tags.some((tag) => tag.slug === tagFilter)) &&
+        (hiddenFilter ? !post.listed : true) &&
         (!normalizedQuery ||
           [
             post.title,
@@ -47,7 +51,7 @@ function AdminPostsPage() {
             .toLowerCase()
             .includes(normalizedQuery)),
     );
-  }, [rows, query, statusFilter, seriesFilter, tagFilter]);
+  }, [rows, query, statusFilter, seriesFilter, tagFilter, hiddenFilter]);
 
   const seriesOptions = useMemo(() => {
     const seriesBySlug = new Map<string, NonNullable<Post["series"]>>();
@@ -144,6 +148,27 @@ function AdminPostsPage() {
     toast.success(copy.deleteSuccess(post.title));
   };
 
+  const changePostListed = async (post: Post, listed: boolean) => {
+    const response = await fetch(`/api/posts/${post.id}?lang=${locale}`, {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ listed }),
+    }).catch(() => null);
+
+    if (!response?.ok) {
+      toast.error(copy.showInListError, {
+        description: response
+          ? await getResponseErrorMessage(response, copy.showInListError)
+          : copy.networkError,
+      });
+      return;
+    }
+
+    const payload = (await response.json()) as { data: Post };
+    upsertPost(payload.data);
+    toast.success(copy.showInListSuccess(post.title));
+  };
+
   const toggleAllVisiblePosts = (checked: boolean) => {
     const visibleIds = visiblePosts.map((post) => post.id);
 
@@ -227,6 +252,10 @@ function AdminPostsPage() {
         onChangePostStatus={(post, status) => void changePostStatus(post, status)}
         onDeletePost={(post) => void deletePost(post)}
         onBatchAction={(action) => void applyBatchAction(action)}
+        hiddenFilter={hiddenFilter}
+        hiddenCount={hiddenCount}
+        onHiddenFilterChange={setHiddenFilter}
+        onShowInList={(post) => void changePostListed(post, true)}
       />
     </section>
   );
@@ -254,6 +283,8 @@ function getAdminPostsCopy(locale: "en" | "zh") {
       deleteError: "文章删除失败",
       deleteSuccess: (title: string) => `“${title}”已删除`,
       networkError: "网络异常，请稍后再试。",
+      showInListError: "操作失败，请重试。",
+      showInListSuccess: (title: string) => `“${title}”已重新显示到公开列表`,
       statusError: (status: ContentStatus) =>
         status === "published"
           ? "文章发布失败"
@@ -289,6 +320,8 @@ function getAdminPostsCopy(locale: "en" | "zh") {
     deleteError: "Post could not be deleted",
     deleteSuccess: (title: string) => `"${title}" deleted`,
     networkError: "Network error. Try again in a moment.",
+    showInListError: "Could not update the post. Try again.",
+    showInListSuccess: (title: string) => `"${title}" is now shown in the public list`,
     statusError: (status: ContentStatus) =>
       status === "published"
         ? "Post could not be published"

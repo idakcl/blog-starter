@@ -1527,6 +1527,48 @@ export const admin_posts_not_public: ((inputs?: Admin_Posts_Not_PublicInputs, op
 /**
 * | output |
 * | --- |
+* | "Hidden posts" |
+*
+* @param {Admin_Posts_Show_HiddenInputs} inputs
+* @param {{ locale?: "en" | "zh" }} options
+* @returns {LocalizedString}
+*/
+export const admin_posts_show_hidden: ((inputs?: Admin_Posts_Show_HiddenInputs, options?: {
+    locale?: "en" | "zh";
+}) => LocalizedString) & import("../runtime.js").MessageMetadata<Admin_Posts_Show_HiddenInputs, {
+    locale?: "en" | "zh";
+}, {}>;
+/**
+* | output |
+* | --- |
+* | "Show in list" |
+*
+* @param {Admin_Posts_Show_In_ListInputs} inputs
+* @param {{ locale?: "en" | "zh" }} options
+* @returns {LocalizedString}
+*/
+export const admin_posts_show_in_list: ((inputs?: Admin_Posts_Show_In_ListInputs, options?: {
+    locale?: "en" | "zh";
+}) => LocalizedString) & import("../runtime.js").MessageMetadata<Admin_Posts_Show_In_ListInputs, {
+    locale?: "en" | "zh";
+}, {}>;
+/**
+* | output |
+* | --- |
+* | "Hidden" |
+*
+* @param {Admin_Posts_Hidden_BadgeInputs} inputs
+* @param {{ locale?: "en" | "zh" }} options
+* @returns {LocalizedString}
+*/
+export const admin_posts_hidden_badge: ((inputs?: Admin_Posts_Hidden_BadgeInputs, options?: {
+    locale?: "en" | "zh";
+}) => LocalizedString) & import("../runtime.js").MessageMetadata<Admin_Posts_Hidden_BadgeInputs, {
+    locale?: "en" | "zh";
+}, {}>;
+/**
+* | output |
+* | --- |
 * | "Public URL" |
 *
 * @param {Admin_Posts_Public_UrlInputs} inputs
@@ -5074,6 +5116,9 @@ export type Admin_Posts_Filter_TagInputs = {};
 export type Admin_Posts_Move_To_DraftInputs = {};
 export type Admin_Posts_No_SeriesInputs = {};
 export type Admin_Posts_Not_PublicInputs = {};
+export type Admin_Posts_Show_HiddenInputs = {};
+export type Admin_Posts_Show_In_ListInputs = {};
+export type Admin_Posts_Hidden_BadgeInputs = {};
 export type Admin_Posts_Public_UrlInputs = {};
 export type Admin_Posts_SearchInputs = {};
 export type Admin_Posts_Select_AllInputs = {};

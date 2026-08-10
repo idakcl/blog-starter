@@ -111,6 +111,9 @@ import { getLocale, experimentalStaticLocale } from "../runtime.js"
 /** @typedef {{}} Admin_Posts_Move_To_DraftInputs */
 /** @typedef {{}} Admin_Posts_No_SeriesInputs */
 /** @typedef {{}} Admin_Posts_Not_PublicInputs */
+/** @typedef {{}} Admin_Posts_Show_HiddenInputs */
+/** @typedef {{}} Admin_Posts_Show_In_ListInputs */
+/** @typedef {{}} Admin_Posts_Hidden_BadgeInputs */
 /** @typedef {{}} Admin_Posts_Public_UrlInputs */
 /** @typedef {{}} Admin_Posts_SearchInputs */
 /** @typedef {{}} Admin_Posts_Select_AllInputs */
@@ -1883,6 +1886,48 @@ export const admin_posts_not_public = /** @type {((inputs?: Admin_Posts_Not_Publ
 	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
 	if (locale === "en") return __en.admin_posts_not_public(inputs)
 	return __zh.admin_posts_not_public(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Hidden posts" |
+*
+* @param {Admin_Posts_Show_HiddenInputs} inputs
+* @param {{ locale?: "en" | "zh" }} options
+* @returns {LocalizedString}
+*/
+export const admin_posts_show_hidden = /** @type {((inputs?: Admin_Posts_Show_HiddenInputs, options?: { locale?: "en" | "zh" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Admin_Posts_Show_HiddenInputs, { locale?: "en" | "zh" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.admin_posts_show_hidden(inputs)
+	return __zh.admin_posts_show_hidden(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Show in list" |
+*
+* @param {Admin_Posts_Show_In_ListInputs} inputs
+* @param {{ locale?: "en" | "zh" }} options
+* @returns {LocalizedString}
+*/
+export const admin_posts_show_in_list = /** @type {((inputs?: Admin_Posts_Show_In_ListInputs, options?: { locale?: "en" | "zh" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Admin_Posts_Show_In_ListInputs, { locale?: "en" | "zh" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.admin_posts_show_in_list(inputs)
+	return __zh.admin_posts_show_in_list(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Hidden" |
+*
+* @param {Admin_Posts_Hidden_BadgeInputs} inputs
+* @param {{ locale?: "en" | "zh" }} options
+* @returns {LocalizedString}
+*/
+export const admin_posts_hidden_badge = /** @type {((inputs?: Admin_Posts_Hidden_BadgeInputs, options?: { locale?: "en" | "zh" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Admin_Posts_Hidden_BadgeInputs, { locale?: "en" | "zh" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.admin_posts_hidden_badge(inputs)
+	return __zh.admin_posts_hidden_badge(inputs)
 });
 /**
 * | output |
