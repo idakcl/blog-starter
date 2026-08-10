@@ -12,7 +12,7 @@ import {
 import * as schema from "@repo/db/schema/cms";
 import { eq, and, or, desc, sql } from "drizzle-orm";
 
-import { cachedGet, invalidateCache } from "./cms-cache";
+import { invalidateCache } from "./cms-cache";
 import {
   type AssetInput,
   type SiteSettingsInput,
@@ -28,7 +28,6 @@ import { getCmsDb } from "./cms-db";
 // ---------------------------------------------------------------------------
 
 const siteSettingsKey = "site";
-const SITE_SETTINGS_VERSION_KEY = "site:settings:version";
 
 /**
  * 返回站点设置的版本戳（即 DB 行的 updatedAt）。
@@ -36,25 +35,26 @@ const SITE_SETTINGS_VERSION_KEY = "site:settings:version";
  * 否则保存站点名称等设置后要等边缘缓存（s-maxage=300）过期才生效。
  */
 export async function getSiteSettingsCacheVersion(): Promise<string> {
-  return cachedGet(SITE_SETTINGS_VERSION_KEY, async () => {
-    try {
-      const db = getCmsDb();
-      const rows = await db
-        .select({ updatedAt: schema.siteSettings.updatedAt })
-        .from(schema.siteSettings)
-        .where(eq(schema.siteSettings.key, siteSettingsKey))
-        .limit(1);
-      return rows[0]?.updatedAt ?? "v0";
-    } catch {
-      return "v0";
-    }
-  });
+  // 每次直接读 D1 的 updatedAt，不使用 KV 缓存。该版本戳用于给公开 HTML
+  // 的边缘缓存键加戳；若走 Cloudflare KV 缓存，其最终一致性会让「删除旧版本」
+  // 在边缘迟迟不生效，导致保存设置后前台长时间（甚至 5 分钟以上）显示旧值。
+  try {
+    const db = getCmsDb();
+    const rows = await db
+      .select({ updatedAt: schema.siteSettings.updatedAt })
+      .from(schema.siteSettings)
+      .where(eq(schema.siteSettings.key, siteSettingsKey))
+      .limit(1);
+    return rows[0]?.updatedAt ?? "v0";
+  } catch {
+    return "v0";
+  }
 }
 
 export async function getD1SiteSettings(locale?: SupportedLocale) {
-  const settings = await cachedGet("site:settings", () =>
-    readD1SiteSettings().catch(() => runtimeDefaultSiteSettings()),
-  );
+  // 直接读 D1（强一致），不经 KV 缓存。站点设置保存后必须立即对所有页面
+  // 生效；Cloudflare KV 的最终一致性会让旧值在边缘残留，造成「保存了但没变化」。
+  const settings = await readD1SiteSettings().catch(() => runtimeDefaultSiteSettings());
 
   return locale ? localizeSiteSettings(settings, locale) : settings;
 }
@@ -72,7 +72,8 @@ async function readD1SiteSettings() {
 }
 
 export async function updateD1SiteSettings(input: SiteSettingsInput) {
-  const current = await getD1SiteSettings();
+  // 直接读 D1 取当前值（不经 KV 缓存，避免读回被缓存的旧值）。
+  const current = await readD1SiteSettings();
   const settings = normalizeSiteSettings(input, current);
   const now = new Date().toISOString();
 
@@ -85,7 +86,8 @@ export async function updateD1SiteSettings(input: SiteSettingsInput) {
       set: { value: settings, updatedAt: now },
     });
 
-  await invalidateCache("site:settings", "sitemap:paths", SITE_SETTINGS_VERSION_KEY);
+  // 站点设置与版本戳已改为每次直读 D1，无需再清 KV；仅需清 sitemap 缓存。
+  await invalidateCache("sitemap:paths");
 
   return settings;
 }
