@@ -4954,20 +4954,6 @@ export const view_all_posts: ((inputs?: View_All_PostsInputs, options?: {
 }) => LocalizedString) & import("../runtime.js").MessageMetadata<View_All_PostsInputs, {
     locale?: "en" | "zh";
 }, {}>;
-/**
-* | output |
-* | --- |
-* | "No posts yet." |
-*
-* @param {No_Posts_YetInputs} inputs
-* @param {{ locale?: "en" | "zh" }} options
-* @returns {LocalizedString}
-*/
-export const no_posts_yet: ((inputs?: No_Posts_YetInputs, options?: {
-    locale?: "en" | "zh";
-}) => LocalizedString) & import("../runtime.js").MessageMetadata<No_Posts_YetInputs, {
-    locale?: "en" | "zh";
-}, {}>;
 export type LocalizedString = import("../runtime.js").LocalizedString;
 export type AdminInputs = {};
 export type Admin_Assets_DescriptionInputs = {};
@@ -5366,4 +5352,3 @@ export type Theme_ToggleInputs = {};
 export type UpdatedInputs = {};
 export type UploadInputs = {};
 export type View_All_PostsInputs = {};
-export type No_Posts_YetInputs = {};

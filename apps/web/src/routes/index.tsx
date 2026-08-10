@@ -163,7 +163,9 @@ function HomePage() {
             ))}
           </div>
         ) : (
-          <p className="py-8 text-center text-muted-foreground">{m.no_posts_yet()}</p>
+          <p className="py-8 text-center text-muted-foreground">
+            {m.no_posts_yet ? m.no_posts_yet() : "暂无文章"}
+          </p>
         )}
 
         {posts.length > 10 ? (

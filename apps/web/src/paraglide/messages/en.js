@@ -354,7 +354,6 @@
 /** @typedef {{}} UpdatedInputs */
 /** @typedef {{}} UploadInputs */
 /** @typedef {{}} View_All_PostsInputs */
-/** @typedef {{}} No_Posts_YetInputs */
 
 
 export const admin = /** @type {(inputs: AdminInputs) => LocalizedString} */ () => {
@@ -1771,8 +1770,4 @@ export const upload = /** @type {(inputs: UploadInputs) => LocalizedString} */ (
 
 export const view_all_posts = /** @type {(inputs: View_All_PostsInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`View all posts`)
-};
-
-export const no_posts_yet = /** @type {(inputs: No_Posts_YetInputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`No posts yet.`)
 };

@@ -2,7 +2,7 @@ import handler from "@tanstack/react-start/server-entry";
 
 import { getSiteSettingsCacheVersion } from "#/lib/cms-d1";
 import { sendDueWeeklyBlogUpdates } from "#/lib/email-notifications";
-import { cookieMaxAge, cookieName, defineCustomServerStrategy } from "#/paraglide/runtime.js";
+import { defineCustomServerStrategy } from "#/paraglide/runtime.js";
 import { paraglideMiddleware } from "#/paraglide/server.js";
 
 // Register a custom strategy that returns zh as the default locale
@@ -57,18 +57,7 @@ export default {
 
     return handlePublicHtmlCache(
       request,
-      () =>
-        paraglideMiddleware(request, async ({ request: req, locale }) => {
-          // handler.fetch 返回 Promise<Response>，必须先 await 再处理，
-          // 否则拿到的 response 仍是 Promise，访问 .headers 会抛错并导致 Worker 1101。
-          const response = await handler.fetch(req);
-          // 服务端按策略解析出 locale 后，仅在访问者尚未显式选择语言时把它写入
-          // PARAGLIDE_LOCALE cookie。客户端 preferredLanguage 策略会先读到该 cookie，
-          // 从而与 SSR 使用同一语言，避免水合时因 navigator.language 与服务端不一致
-          // 而反复抛出 React #418 文本不匹配。已设置过 cookie 的访问者不受影响，
-          // 也不会破坏无 cookie 首次访问的边缘 HTML 缓存。
-          return stampLocaleCookie(response, locale, request);
-        }),
+      () => paraglideMiddleware(request, ({ request: req }) => handler.fetch(req)),
       ctx,
     );
   },
@@ -176,87 +165,6 @@ function withPublicHtmlCacheHeaders(response: Response) {
     status: response.status,
     statusText: response.statusText,
   });
-}
-
-/**
- * 把服务端解析出的语言写入 cookie（仅当访问者尚未显式选择语言时）。
- * 这样客户端水合阶段读到的 locale 与 SSR 一致，避免 React #418 文本不匹配。
- */
-function stampLocaleCookie(response: Response, locale: string, request: Request): Response {
-  if (locale !== "en" && locale !== "zh") {
-    return response;
-  }
-
-  // 访问者已显式选过语言（cookie 存在），或本次响应已设置，则不再覆盖。
-  const requestCookies = parseCookieHeader(request.headers.get("cookie"));
-  if (requestCookies[cookieName] || responseHasCookie(response, cookieName)) {
-    return response;
-  }
-
-  const headers = new Headers(response.headers);
-  headers.append(
-    "set-cookie",
-    `${cookieName}=${locale}; Path=/; Max-Age=${cookieMaxAge}; SameSite=Lax`,
-  );
-
-  return new Response(response.body, {
-    headers,
-    status: response.status,
-    statusText: response.statusText,
-  });
-}
-
-function responseHasCookie(response: Response, name: string): boolean {
-  return Boolean(parseCookieHeaderFromList(response.headers.getSetCookie?.() ?? []).get(name));
-}
-
-function parseCookieHeader(raw: string | null): Record<string, string> {
-  const map: Record<string, string> = {};
-
-  if (!raw) {
-    return map;
-  }
-
-  for (const part of raw.split(";")) {
-    const index = part.indexOf("=");
-
-    if (index <= 0) {
-      continue;
-    }
-
-    const key = part.slice(0, index).trim();
-    const value = part.slice(index + 1).trim();
-
-    if (key && !map[key]) {
-      map[key] = value;
-    }
-  }
-
-  return map;
-}
-
-function parseCookieHeaderFromList(values: string[]): Map<string, string> {
-  const map = new Map<string, string>();
-
-  for (const header of values) {
-    const index = header.indexOf("=");
-
-    if (index <= 0) {
-      continue;
-    }
-
-    const key = header.slice(0, index).trim();
-    const value = header
-      .split(";")[0]
-      .slice(index + 1)
-      .trim();
-
-    if (key && !map.has(key)) {
-      map.set(key, value);
-    }
-  }
-
-  return map;
 }
 
 function redirectInsecureToHttps(request: Request): Response | null {
