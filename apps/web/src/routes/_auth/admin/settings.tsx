@@ -184,7 +184,7 @@ function AdminSettingsPage() {
     let ignore = false;
 
     void Promise.all([
-      fetch("/api/site").then((response) => (response.ok ? response.json() : undefined)),
+      fetch("/api/site?raw=1").then((response) => (response.ok ? response.json() : undefined)),
       fetch("/api/admin/email-status").then((response) =>
         response.ok ? response.json() : undefined,
       ),

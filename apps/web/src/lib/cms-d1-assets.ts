@@ -75,6 +75,14 @@ export async function updateD1SiteSettings(input: SiteSettingsInput) {
   // 直接读 D1 取当前值（不经 KV 缓存，避免读回被缓存的旧值）。
   const current = await readD1SiteSettings();
   const settings = normalizeSiteSettings(input, current);
+
+  // 简单设置表单只编辑「规范值」（name/description/authorBio 等），并不管理
+  // 逐语言翻译。若保留旧的 i18n 覆盖（例如初始化时写入的 i18n.name.en="My Blog"），
+  // 经 localizeSiteSettings 后会在任何语言下都优先显示该旧值，导致「保存成功但
+  // 刷新后名称恢复成 My Blog」的假象。保存时清掉这些过期的逐语言覆盖，使本地化
+  // 回退到规范值。
+  settings.i18n = {};
+
   const now = new Date().toISOString();
 
   const db = getCmsDb();

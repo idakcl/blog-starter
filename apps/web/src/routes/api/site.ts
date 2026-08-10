@@ -15,8 +15,16 @@ export const Route = createFileRoute("/api/site")({
           return accessError;
         }
 
+        // 编辑场景（如后台设置表单）需要规范的存储值，不应被 localizeSiteSettings
+        // 本地化（否则会显示过期的逐语言覆盖，或把中文导航标签翻成英文导致保存时丢失）。
+        // 传入 ?raw 时返回未本地化的规范设置；其余场景按请求语言本地化显示。
+        const raw = new URL(request.url).searchParams.has("raw");
+        const data = raw
+          ? await getD1SiteSettings()
+          : await getD1SiteSettings(getApiLocale(request));
+
         return jsonResponse({
-          data: await getD1SiteSettings(getApiLocale(request)),
+          data,
           requiredScope: "site:read",
         });
       },
