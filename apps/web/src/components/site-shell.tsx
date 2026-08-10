@@ -23,9 +23,11 @@ import { m } from "#/paraglide/messages.js";
 export function SiteShell({
   children,
   siteSettings: providedSiteSettings,
+  showBrand = true,
 }: {
   readonly children: React.ReactNode;
   readonly siteSettings?: SiteSettings;
+  readonly showBrand?: boolean;
 }) {
   const locale = getCurrentLocale();
   const siteSettings = providedSiteSettings ?? getSiteSettingsForLocale(locale);
@@ -50,9 +52,11 @@ export function SiteShell({
     >
       <header className="sticky top-0 z-40 border-b-2 border-foreground bg-background/95 backdrop-blur-xl">
         <div className="mx-auto flex min-h-14 max-w-7xl items-center justify-between gap-4 px-4 py-2 sm:px-6 lg:px-8">
-          <Link to="/" className={siteBrandLinkClassName} aria-label={siteSettings.name}>
-            <SiteBrandText name={siteSettings.name} />
-          </Link>
+          {showBrand ? (
+            <Link to="/" className={siteBrandLinkClassName} aria-label={siteSettings.name}>
+              <SiteBrandText name={siteSettings.name} />
+            </Link>
+          ) : null}
 
           <nav className="hidden items-center gap-6 md:flex">
             {localizedNavigation.map((item) => (
