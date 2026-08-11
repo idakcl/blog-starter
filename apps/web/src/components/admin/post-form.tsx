@@ -948,8 +948,8 @@ export function PostForm({
         </div>
       </div>
 
-      <div className="grid gap-4 border-b border-border/80 pb-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
-        <div className="grid gap-3">
+      <div className="grid min-w-0 gap-4 border-b border-border/80 pb-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
+        <div className="grid min-w-0 gap-3">
           <div className="flex items-center justify-between gap-3">
             <Label htmlFor="editor-cover-file">{m.admin_editor_cover_image()}</Label>
             {trimmedCoverImage ? (
@@ -974,7 +974,7 @@ export function PostForm({
             onDragLeave={() => setIsCoverDragging(false)}
             onDrop={handleCoverDrop}
             className={cn(
-              "relative flex aspect-[16/9] min-h-56 overflow-hidden rounded-md border border-border bg-muted transition",
+              "relative flex aspect-[16/9] min-h-56 w-full overflow-hidden rounded-md border border-border bg-muted transition",
               isCoverDragging && "border-link ring-3 ring-link/15",
             )}
           >
@@ -1030,7 +1030,7 @@ export function PostForm({
           ) : null}
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid min-w-0 gap-4 lg:grid-cols-2">
           <div className="grid gap-2">
             <Label htmlFor="editor-series">{m.admin_editor_series()}</Label>
             <select
@@ -1064,7 +1064,7 @@ export function PostForm({
               defaultValue={toDatetimeLocal(editingPost?.publishedAt ?? fallbackPublishedAtIso)}
             />
           </div>
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-3 md:col-span-2">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-3 lg:col-span-2">
             <label className="flex min-h-9 items-center gap-2 text-sm">
               <input
                 type="checkbox"

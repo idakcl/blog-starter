@@ -59,7 +59,11 @@ export function SiteShell({
         <div className="mx-auto flex min-h-14 max-w-7xl items-center justify-between gap-4 px-4 py-2 sm:px-6 lg:px-8">
           {showBrand ? (
             <Link to="/" className={siteBrandLinkClassName} aria-label={siteSettings.name}>
-              <SiteBrandText name={siteSettings.name} />
+              <SiteBrandText
+                avatarUrl={siteSettings.avatarUrl}
+                description={siteSettings.description}
+                name={siteSettings.name}
+              />
             </Link>
           ) : null}
 

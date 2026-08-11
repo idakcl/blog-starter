@@ -1,5 +1,5 @@
 import type { AuthQueryResult } from "@repo/auth/tanstack/queries";
-import { getSiteSettingsForLocale, type SiteSettings } from "@repo/core";
+import { getSiteSettingsForLocale, localizeSiteSettings, type SiteSettings } from "@repo/core";
 import { Button } from "@repo/ui/components/button";
 import { cn } from "@repo/ui/lib/utils";
 import { Link, Outlet } from "@tanstack/react-router";
@@ -40,10 +40,20 @@ const adminNav = [
   { label: m.admin_nav_settings, href: "/admin/settings", icon: SettingsIcon },
 ];
 
-export function AdminShell({ user }: { readonly user: AuthQueryResult }) {
+export function AdminShell({
+  initialSiteSettings,
+  user,
+}: {
+  readonly initialSiteSettings?: SiteSettings;
+  readonly user: AuthQueryResult;
+}) {
   const locale = getCurrentLocale();
   const isAdmin = user?.role === "admin";
-  const [siteSettings, setSiteSettings] = useState<SiteSettings>(getSiteSettingsForLocale(locale));
+  // 初始即使用 loader 注入的真实站点设置（含已配置主题），避免 SSR/水合用
+  // 种子默认值、再经 useEffect 的 fetch 异步切换到真实主题而产生的“闪白”。
+  const [siteSettings, setSiteSettings] = useState<SiteSettings>(
+    initialSiteSettings ?? getSiteSettingsForLocale(locale),
+  );
   const settingsPreset = resolveStylePreset(siteSettings.themePreset, siteSettings.layoutPreset);
   const { preset, nextPreset, selectPreset, resetPreset } = useStylePreset(settingsPreset);
 
@@ -68,7 +78,7 @@ export function AdminShell({ user }: { readonly user: AuthQueryResult }) {
         const data = (payload as { data?: SiteSettings } | undefined)?.data;
 
         if (!ignore && data) {
-          setSiteSettings(data);
+          setSiteSettings(localizeSiteSettings(data, locale));
         }
       });
 
@@ -96,12 +106,16 @@ export function AdminShell({ user }: { readonly user: AuthQueryResult }) {
         nextPreset={nextPreset}
         onPresetSelect={selectPreset}
         siteName={siteSettings.name}
+        siteAvatarUrl={siteSettings.avatarUrl}
+        siteDescription={siteSettings.description}
       />
       <MobileAdminHeader
         locale={locale}
         nextPreset={nextPreset}
         onPresetSelect={selectPreset}
         siteName={siteSettings.name}
+        siteAvatarUrl={siteSettings.avatarUrl}
+        siteDescription={siteSettings.description}
       />
       <StylePresetRuntimeScript initialPreset={preset} locale={locale} />
 
@@ -197,18 +211,22 @@ function DesktopSidebar({
   locale,
   nextPreset,
   onPresetSelect,
+  siteAvatarUrl,
+  siteDescription,
   siteName,
 }: {
   readonly locale: ReturnType<typeof getCurrentLocale>;
   readonly nextPreset: StylePresetOption;
   readonly onPresetSelect: (preset: StylePresetOption) => void;
+  readonly siteAvatarUrl: string;
+  readonly siteDescription: string;
   readonly siteName: string;
 }) {
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-72 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground lg:flex">
       <div className="border-b border-sidebar-border px-5 py-4">
         <Link to="/" className={cn(siteBrandLinkClassName, "block")} title={siteName}>
-          <SiteBrandText name={siteName} />
+          <SiteBrandText avatarUrl={siteAvatarUrl} description={siteDescription} name={siteName} />
         </Link>
         <div className="mt-3 flex items-center gap-1">
           <LanguageToggle />
@@ -236,18 +254,22 @@ function MobileAdminHeader({
   locale,
   nextPreset,
   onPresetSelect,
+  siteAvatarUrl,
+  siteDescription,
   siteName,
 }: {
   readonly locale: ReturnType<typeof getCurrentLocale>;
   readonly nextPreset: StylePresetOption;
   readonly onPresetSelect: (preset: StylePresetOption) => void;
+  readonly siteAvatarUrl: string;
+  readonly siteDescription: string;
   readonly siteName: string;
 }) {
   return (
     <header className="sticky top-0 z-40 border-b border-sidebar-border bg-sidebar/95 text-sidebar-foreground backdrop-blur-xl lg:hidden">
       <div className="flex min-h-14 items-center justify-between gap-3 px-4">
         <Link to="/" className={siteBrandLinkClassName} title={siteName}>
-          <SiteBrandText name={siteName} />
+          <SiteBrandText avatarUrl={siteAvatarUrl} description={siteDescription} name={siteName} />
         </Link>
         <div className="flex shrink-0 items-center gap-1">
           <LanguageToggle />
