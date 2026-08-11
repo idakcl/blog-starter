@@ -13,17 +13,28 @@ import {
   useStylePreset,
 } from "#/components/style-preset-switcher";
 import { ThemeToggle } from "#/components/theme-toggle";
+import { $getSiteSettings } from "#/lib/cms-server";
 import { getCurrentLocale } from "#/lib/i18n";
 import { m } from "#/paraglide/messages.js";
 
 export const Route = createFileRoute("/_auth/app")({
   component: AppLayout,
+  // 登录后客户端导航落到 /app（账号中心）时，直接用 loader 注入的真实站点设置作为
+  // 初始值。否则首帧会使用种子默认主题（maker / 白），再经 useEffect 的 fetch 切换
+  // 到真实主题，导致登录后到达后台第一帧闪现一次白色主题。
+  loader: async () => {
+    const locale = getCurrentLocale();
+    const siteSettings = localizeSiteSettings(await $getSiteSettings(), locale);
+
+    return { siteSettings };
+  },
 });
 
 function AppLayout() {
   const locale = getCurrentLocale();
-  const [siteSettings, setSiteSettings] = useState<SiteSettings>(() =>
-    getSiteSettingsForLocale(locale),
+  const { siteSettings: initialSiteSettings } = Route.useLoaderData();
+  const [siteSettings, setSiteSettings] = useState<SiteSettings>(
+    () => initialSiteSettings ?? getSiteSettingsForLocale(locale),
   );
   const settingsPreset = resolveStylePreset(siteSettings.themePreset, siteSettings.layoutPreset);
   const { preset, nextPreset, selectPreset } = useStylePreset(settingsPreset);
