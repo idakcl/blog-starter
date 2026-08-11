@@ -299,7 +299,7 @@ import { getLocale, experimentalStaticLocale } from "../runtime.js"
 /** @typedef {{}} Login_AlternativeInputs */
 /** @typedef {{}} Login_EmailInputs */
 /** @typedef {{}} Login_ErrorInputs */
-/** @typedef {{ name: NonNullable<unknown> }} Login_GreetingInputs */
+/** @typedef {{}} Login_GreetingInputs */
 /** @typedef {{}} Login_No_AccountInputs */
 /** @typedef {{}} Login_PasswordInputs */
 /** @typedef {{}} Login_Password_PlaceholderInputs */
@@ -4523,13 +4523,13 @@ export const login_error = /** @type {((inputs?: Login_ErrorInputs, options?: { 
 /**
 * | output |
 * | --- |
-* | "Welcome back to {name}" |
+* | "Welcome back" |
 *
 * @param {Login_GreetingInputs} inputs
 * @param {{ locale?: "en" | "zh" }} options
 * @returns {LocalizedString}
 */
-export const login_greeting = /** @type {((inputs: Login_GreetingInputs, options?: { locale?: "en" | "zh" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Login_GreetingInputs, { locale?: "en" | "zh" }, {}>} */ ((inputs, options = {}) => {
+export const login_greeting = /** @type {((inputs?: Login_GreetingInputs, options?: { locale?: "en" | "zh" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Login_GreetingInputs, { locale?: "en" | "zh" }, {}>} */ ((inputs = {}, options = {}) => {
 	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
 	if (locale === "en") return __en.login_greeting(inputs)
 	return __zh.login_greeting(inputs)

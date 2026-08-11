@@ -297,7 +297,7 @@
 /** @typedef {{}} Login_AlternativeInputs */
 /** @typedef {{}} Login_EmailInputs */
 /** @typedef {{}} Login_ErrorInputs */
-/** @typedef {{ name: NonNullable<unknown> }} Login_GreetingInputs */
+/** @typedef {{}} Login_GreetingInputs */
 /** @typedef {{}} Login_No_AccountInputs */
 /** @typedef {{}} Login_PasswordInputs */
 /** @typedef {{}} Login_Password_PlaceholderInputs */
@@ -1548,8 +1548,8 @@ export const login_error = /** @type {(inputs: Login_ErrorInputs) => LocalizedSt
 	return /** @type {LocalizedString} */ (`登录时出现错误。`)
 };
 
-export const login_greeting = /** @type {(inputs: Login_GreetingInputs) => LocalizedString} */ (i) => {
-	return /** @type {LocalizedString} */ (`欢迎回到 ${i?.name}`)
+export const login_greeting = /** @type {(inputs: Login_GreetingInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`欢迎回来`)
 };
 
 export const login_no_account = /** @type {(inputs: Login_No_AccountInputs) => LocalizedString} */ () => {

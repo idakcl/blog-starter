@@ -9,7 +9,6 @@ import {
   FileTextIcon,
   HomeIcon,
   InfoIcon,
-  Loader2Icon,
   SearchIcon,
   UserCircleIcon,
 } from "lucide-react";
@@ -103,7 +102,6 @@ export function SiteShell({
             />
             <ThemeToggle className="hidden md:inline-flex" />
             {githubLink ? <HeaderGitHubLink link={githubLink} /> : null}
-            <HeaderAuthAction className="hidden md:inline-flex" />
           </div>
         </div>
       </header>
@@ -273,53 +271,6 @@ function HeaderGitHubLink({ link }: { readonly link: SocialLink }) {
     >
       <SiGithub className="size-4" />
       <span className="sr-only">{link.label}</span>
-    </Button>
-  );
-}
-
-function HeaderAuthAction({ className }: { readonly className?: string }) {
-  const { user, isPending } = useAuth();
-
-  if (isPending) {
-    return (
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        disabled
-        className={cn("min-w-14", className)}
-        aria-label={m.login()}
-      >
-        <Loader2Icon className="animate-spin" />
-      </Button>
-    );
-  }
-
-  if (user) {
-    return (
-      <Button
-        render={<Link to="/app" />}
-        variant="outline"
-        size="sm"
-        nativeButton={false}
-        className={cn("min-w-14 px-3 font-semibold", className)}
-        aria-label={m.account_title()}
-      >
-        {m.account_title()}
-      </Button>
-    );
-  }
-
-  return (
-    <Button
-      render={<Link to="/login" />}
-      variant="outline"
-      size="sm"
-      nativeButton={false}
-      className={cn("min-w-14 px-3 font-semibold", className)}
-      aria-label={m.login()}
-    >
-      {m.login()}
     </Button>
   );
 }

@@ -4159,13 +4159,13 @@ export const login_error: ((inputs?: Login_ErrorInputs, options?: {
 /**
 * | output |
 * | --- |
-* | "Welcome back to {name}" |
+* | "Welcome back" |
 *
 * @param {Login_GreetingInputs} inputs
 * @param {{ locale?: "en" | "zh" }} options
 * @returns {LocalizedString}
 */
-export const login_greeting: ((inputs: Login_GreetingInputs, options?: {
+export const login_greeting: ((inputs?: Login_GreetingInputs, options?: {
     locale?: "en" | "zh";
 }) => LocalizedString) & import("../runtime.js").MessageMetadata<Login_GreetingInputs, {
     locale?: "en" | "zh";
@@ -5334,9 +5334,7 @@ export type LoginInputs = {};
 export type Login_AlternativeInputs = {};
 export type Login_EmailInputs = {};
 export type Login_ErrorInputs = {};
-export type Login_GreetingInputs = {
-    name: NonNullable<unknown>;
-};
+export type Login_GreetingInputs = {};
 export type Login_No_AccountInputs = {};
 export type Login_PasswordInputs = {};
 export type Login_Password_PlaceholderInputs = {};

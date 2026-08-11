@@ -117,7 +117,7 @@ function LoginForm() {
               </div>
               <span className="sr-only">{siteSettings.name}</span>
             </Link>
-            <h1 className="text-xl font-bold">{m.login_greeting({ name: siteSettings.name })}</h1>
+            <h1 className="text-xl font-bold">{m.login_greeting({})}</h1>
           </div>
           {search.error ? (
             <p className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">

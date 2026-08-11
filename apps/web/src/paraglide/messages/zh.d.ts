@@ -296,7 +296,7 @@
 /** @typedef {{}} Login_AlternativeInputs */
 /** @typedef {{}} Login_EmailInputs */
 /** @typedef {{}} Login_ErrorInputs */
-/** @typedef {{ name: NonNullable<unknown> }} Login_GreetingInputs */
+/** @typedef {{}} Login_GreetingInputs */
 /** @typedef {{}} Login_No_AccountInputs */
 /** @typedef {{}} Login_PasswordInputs */
 /** @typedef {{}} Login_Password_PlaceholderInputs */
@@ -1039,9 +1039,7 @@ export type LoginInputs = {};
 export type Login_AlternativeInputs = {};
 export type Login_EmailInputs = {};
 export type Login_ErrorInputs = {};
-export type Login_GreetingInputs = {
-    name: NonNullable<unknown>;
-};
+export type Login_GreetingInputs = {};
 export type Login_No_AccountInputs = {};
 export type Login_PasswordInputs = {};
 export type Login_Password_PlaceholderInputs = {};

@@ -296,7 +296,7 @@
   "login_alternative": "Or",
   "login_email": "Email",
   "login_error": "An error occurred while signing in.",
-  "login_greeting": "Welcome back to {name}",
+  "login_greeting": "Welcome back",
   "login_no_account": "Don't have an account?",
   "login_password": "Password",
   "login_password_placeholder": "Enter password here",
