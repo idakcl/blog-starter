@@ -2,6 +2,7 @@ import { authQueryOptions } from "@repo/auth/tanstack/queries";
 import { getSiteSettingsForLocale } from "@repo/core";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 
+import { SiteShell } from "#/components/site-shell";
 import { redirectForRole, safeAccountRedirectPath } from "#/lib/account-routing";
 import { getCurrentLocale } from "#/lib/i18n";
 import { getServerAuthUser } from "#/lib/route-auth";
@@ -51,14 +52,12 @@ function RouteComponent() {
   const siteSettings = getSiteSettingsForLocale(getCurrentLocale());
 
   return (
-    <div
-      data-theme-preset={siteSettings.themePreset}
-      data-layout-preset={siteSettings.layoutPreset}
-      className="flex min-h-svh flex-col items-center justify-center gap-6 bg-background p-6 md:p-10"
-    >
-      <div className="w-full max-w-sm">
-        <Outlet />
+    <SiteShell siteSettings={siteSettings}>
+      <div className="flex min-h-[calc(100svh-8.5rem)] flex-col items-center justify-center gap-6 bg-background px-6 py-6 md:min-h-[calc(100svh-3.5rem)] md:px-10 md:py-10">
+        <div className="w-full max-w-sm">
+          <Outlet />
+        </div>
       </div>
-    </div>
+    </SiteShell>
   );
 }
