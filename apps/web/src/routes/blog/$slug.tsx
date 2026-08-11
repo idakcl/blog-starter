@@ -147,37 +147,63 @@ function BlogPostPage() {
   const articleBody = buildArticleBody(localizedPost.contentHtml);
   const editLabel = locale === "zh" ? "编辑文章" : m.admin_posts_edit();
 
-  // 文章里的视频：若没有 poster（旧文章 / 首帧捕获失败），用 JS 截取第一帧作为背景海报。
+  // 文章里的视频：若没有 poster（外部视频 / 旧文章 / 首帧捕获失败），截取第一帧作为背景海报。
+  // 用独立的 crossOrigin 探针视频去读像素，避免污染可见视频的画布；对不支持 CORS 的源，
+  // 探针加载失败会被忽略，可见视频仍按原生 preload=metadata 显示首帧，不影响播放。
   useEffect(() => {
     const root = articleRef.current;
     if (!root) return;
     const videos = Array.from(root.querySelectorAll("video")) as HTMLVideoElement[];
+
     videos.forEach((video) => {
       if (video.poster) return; // 已有首帧海报（来自 #poster=），无需兜底
-      const captureFrame = () => {
+
+      const captureFrom = (source: HTMLVideoElement) => {
         try {
           const canvas = document.createElement("canvas");
-          canvas.width = video.videoWidth || 480;
-          canvas.height = video.videoHeight || 270;
+          canvas.width = source.videoWidth || 480;
+          canvas.height = source.videoHeight || 270;
           const ctx = canvas.getContext("2d");
-          if (ctx) {
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          if (ctx && source.videoWidth) {
+            ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
             video.poster = canvas.toDataURL("image/jpeg", 0.85);
           }
         } catch {
-          // 跨域视频且未配置 CORS 时画布会被污染，截图失败属正常，忽略即可
+          // 跨域且源未配置 CORS 时画布会被污染，截图失败属正常，忽略即可
         }
       };
-      const seekToFirstFrame = () => {
-        try {
-          video.currentTime = 0.1;
-        } catch {
-          captureFrame();
-        }
+
+      const probe = document.createElement("video");
+      probe.crossOrigin = "anonymous"; // 仅在探针上开启，便于跨域读取首帧像素
+      probe.muted = true;
+      probe.preload = "metadata";
+      probe.style.cssText =
+        "position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;left:-9999px;";
+      probe.src = video.currentSrc || video.src;
+
+      const cleanup = () => {
+        if (probe.parentNode) probe.parentNode.removeChild(probe);
       };
-      video.addEventListener("loadeddata", seekToFirstFrame, { once: true });
-      video.addEventListener("seeked", captureFrame, { once: true });
-      if (video.readyState >= 1) seekToFirstFrame();
+      const onSeeked = () => {
+        captureFrom(probe);
+        cleanup();
+      };
+      probe.addEventListener("seeked", onSeeked, { once: true });
+      probe.addEventListener(
+        "loadeddata",
+        () => {
+          try {
+            probe.currentTime = 0.1; // 跳到首帧再截
+          } catch {
+            captureFrom(probe);
+            cleanup();
+          }
+        },
+        { once: true },
+      );
+      probe.addEventListener("error", cleanup, { once: true });
+      // 部分浏览器不会为未挂载的 video 触发解码事件，挂到屏外再截帧
+      document.body.appendChild(probe);
     });
   }, [articleBody.html]);
   const coverImage = resolvePostCoverImage(localizedPost.coverImage);
