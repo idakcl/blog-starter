@@ -9,11 +9,8 @@ import { RootProvider as FumadocsRootProvider } from "fumadocs-ui/provider/tanst
 import { Suspense, useEffect } from "react";
 
 import { DocsMDXProvider, useMDXComponents } from "#/components/mdx";
-import {
-  resolveStylePreset,
-  StylePresetRuntimeScript,
-  useStylePreset,
-} from "#/components/style-preset-switcher";
+import { SiteShell } from "#/components/site-shell";
+import { resolveStylePreset, useStylePreset } from "#/components/style-preset-switcher";
 import { getDocsI18nProvider, getDocsUrl } from "#/lib/docs-i18n";
 import { getDocsLayoutOptions } from "#/lib/docs-layout";
 import { setCurrentLocale } from "#/lib/i18n";
@@ -53,41 +50,44 @@ export function DocsRouteView({ data }: { readonly data: DocsRouteData }) {
   }, [data.locale]);
 
   return (
-    <div
-      data-docs-surface=""
-      data-theme-preset={preset.themePreset}
-      data-layout-preset={preset.layoutPreset}
-      suppressHydrationWarning
-      className="min-h-svh bg-background text-foreground"
-    >
-      <StylePresetRuntimeScript initialPreset={preset} locale={data.locale} />
-      <FumadocsRootProvider theme={{ enabled: false }}>
-        <DocsMDXProvider locale={data.locale} slugs={data.slugs}>
-          <I18nProvider
-            {...getDocsI18nProvider(data.locale)}
-            onLocaleChange={(locale) => {
-              const nextLocale = locale === "zh" ? "zh" : "en";
+    <SiteShell siteSettings={data.siteSettings}>
+      <div
+        data-docs-surface=""
+        data-theme-preset={preset.themePreset}
+        data-layout-preset={preset.layoutPreset}
+        suppressHydrationWarning
+        className="min-h-svh bg-background text-foreground"
+      >
+        <FumadocsRootProvider theme={{ enabled: false }}>
+          <DocsMDXProvider locale={data.locale} slugs={data.slugs}>
+            <I18nProvider
+              {...getDocsI18nProvider(data.locale)}
+              onLocaleChange={(locale) => {
+                const nextLocale = locale === "zh" ? "zh" : "en";
 
-              void Promise.resolve(setCurrentLocale(nextLocale, { reload: false })).finally(() => {
-                window.location.href = getDocsUrl(data.slugs, nextLocale);
-              });
-            }}
-          >
-            <DocsLayout
-              {...getDocsLayoutOptions({
-                locale: data.locale,
-                nextPreset,
-                onPresetSelect: selectPreset,
-                siteSettings: data.siteSettings,
-                slugs: data.slugs,
-              })}
-              tree={loaderData.pageTree}
+                void Promise.resolve(setCurrentLocale(nextLocale, { reload: false })).finally(
+                  () => {
+                    window.location.href = getDocsUrl(data.slugs, nextLocale);
+                  },
+                );
+              }}
             >
-              <Suspense>{docsClientLoader.useContent(data.path)}</Suspense>
-            </DocsLayout>
-          </I18nProvider>
-        </DocsMDXProvider>
-      </FumadocsRootProvider>
-    </div>
+              <DocsLayout
+                {...getDocsLayoutOptions({
+                  locale: data.locale,
+                  nextPreset,
+                  onPresetSelect: selectPreset,
+                  siteSettings: data.siteSettings,
+                  slugs: data.slugs,
+                })}
+                tree={loaderData.pageTree}
+              >
+                <Suspense>{docsClientLoader.useContent(data.path)}</Suspense>
+              </DocsLayout>
+            </I18nProvider>
+          </DocsMDXProvider>
+        </FumadocsRootProvider>
+      </div>
+    </SiteShell>
   );
 }

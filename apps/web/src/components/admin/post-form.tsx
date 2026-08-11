@@ -1,3 +1,4 @@
+import type { MDXEditorMethods } from "@mdxeditor/editor";
 import { type Asset, type Post, type Series, renderMarkdownToHtml } from "@repo/core";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
@@ -37,6 +38,7 @@ import {
   adminTextareaClassName,
 } from "#/components/admin/admin-ui";
 import { getCurrentLocale } from "#/lib/i18n";
+import { compressImageFile } from "#/lib/image-compress";
 import { m } from "#/paraglide/messages.js";
 
 const MdxEditorSurface = lazy(() =>
@@ -432,6 +434,7 @@ export function PostForm({
   const saving = editorState === "saving";
   const mediaFileInputRef = useRef<HTMLInputElement | null>(null);
   const sourceTextareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const mdxEditorRef = useRef<MDXEditorMethods | null>(null);
   const markdownRef = useRef(markdown);
   useEffect(() => {
     markdownRef.current = markdown;
@@ -551,6 +554,20 @@ export function PostForm({
   };
 
   const insertMediaSnippet = (snippet: string) => {
+    // 富文本模式：MDXEditor 只在挂载时读取 value，之后不会随 prop 重新同步，
+    // 因此必须用其命令式 API 把片段写进编辑器，否则视觉上“没写入编辑框”。
+    const editor = mdxEditorRef.current;
+
+    if (editor) {
+      const current = editor.getMarkdown() ?? "";
+      const next = current.trim().length > 0 ? `${current}\n\n${snippet}\n` : snippet;
+
+      editor.setMarkdown(next);
+      onMarkdownChange(next);
+
+      return;
+    }
+
     const textarea = sourceTextareaRef.current;
 
     if (textarea) {
@@ -656,7 +673,11 @@ export function PostForm({
       }
 
       const formData = new FormData();
-      formData.append("file", item.file);
+      const fileForUpload =
+        item.kind === "image"
+          ? await compressImageFile(item.file).catch(() => item.file)
+          : item.file;
+      formData.append("file", fileForUpload);
 
       const response = await fetch("/api/media-upload", {
         method: "POST",
@@ -789,6 +810,24 @@ export function PostForm({
   useEffect(() => {
     pumpQueueRef.current();
   }, [mediaItems]);
+
+  // 全部上传完成且没有失败项时，3 秒后自动收起上传面板（有失败项则保留以便重试）。
+  const uploadsAllDone =
+    mediaItems.length > 0 &&
+    activeUploadCount === 0 &&
+    !mediaItems.some((item) => item.status === "error");
+  useEffect(() => {
+    if (!uploadsAllDone) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setPanelOpen(false);
+      setMediaItems([]);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [uploadsAllDone]);
 
   return (
     <form
@@ -1085,6 +1124,7 @@ export function PostForm({
               }
             >
               <MdxEditorSurface
+                editorRef={mdxEditorRef}
                 value={markdown}
                 onChange={onMarkdownChange}
                 className="min-h-[560px]"

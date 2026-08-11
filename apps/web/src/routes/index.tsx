@@ -117,6 +117,14 @@ function HomePage() {
   return (
     <SiteShell siteSettings={siteSettings} showBrand={false}>
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+        <div className="mb-10">
+          <h1 className="text-3xl font-semibold tracking-tight">{siteSettings.name}</h1>
+          {siteSettings.description ? (
+            <p className="mt-3 max-w-2xl leading-7 text-muted-foreground">
+              {siteSettings.description}
+            </p>
+          ) : null}
+        </div>
         {posts.length ? (
           <div className="grid gap-6">
             {posts.map((post) => (

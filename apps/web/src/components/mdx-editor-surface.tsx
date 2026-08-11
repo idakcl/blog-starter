@@ -28,7 +28,9 @@ import {
 
 import "@mdxeditor/editor/style.css";
 import { cn } from "@repo/ui/lib/utils";
-import { useMemo, useSyncExternalStore } from "react";
+import { useMemo, useSyncExternalStore, type Ref } from "react";
+
+import { compressImageFile } from "#/lib/image-compress";
 
 type MdxEditorSurfaceProps = {
   readonly value: string;
@@ -36,6 +38,7 @@ type MdxEditorSurfaceProps = {
   readonly className?: string;
   readonly editorClassName?: string;
   readonly contentEditableClassName?: string;
+  readonly editorRef?: Ref<MDXEditorMethods>;
 };
 
 export function MdxEditorSurface({
@@ -44,6 +47,7 @@ export function MdxEditorSurface({
   className,
   editorClassName,
   contentEditableClassName,
+  editorRef,
 }: MdxEditorSurfaceProps) {
   const mounted = useClientMounted();
   const plugins = useMemo(
@@ -55,8 +59,9 @@ export function MdxEditorSurface({
       linkDialogPlugin(),
       imagePlugin({
         imageUploadHandler: async (file) => {
+          const compressed = await compressImageFile(file).catch(() => file);
           const formData = new FormData();
-          formData.append("file", file);
+          formData.append("file", compressed);
 
           const response = await fetch("/api/media-upload", {
             method: "POST",
@@ -128,6 +133,7 @@ export function MdxEditorSurface({
       )}
     >
       <MDXEditor
+        ref={editorRef}
         markdown={value}
         onChange={(nextValue) => onChange(nextValue)}
         plugins={plugins}
