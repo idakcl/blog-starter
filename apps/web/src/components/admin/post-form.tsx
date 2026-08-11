@@ -63,6 +63,7 @@ type MediaItem = {
   objectUrl?: string;
   thumbUrl?: string;
   controller?: AbortController;
+  abort?: (() => void) | null;
 };
 
 // 把视频第一帧画到 canvas，返回 dataURL，用于在上传面板和文章里作为封面/背景。
@@ -247,7 +248,9 @@ function MediaUploadPanel({
                   <MediaThumb item={item} />
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm">{item.name}</p>
-                    <p className="text-xs text-muted-foreground">{formatBytes(item.size)}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatBytes(item.size)} · {item.progress}%
+                    </p>
                     <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted">
                       <div
                         className="h-full bg-link transition-all"
@@ -559,11 +562,9 @@ export function PostForm({
     const editor = mdxEditorRef.current;
 
     if (editor) {
-      const current = editor.getMarkdown() ?? "";
-      const next = current.trim().length > 0 ? `${current}\n\n${snippet}\n` : snippet;
-
-      editor.setMarkdown(next);
-      onMarkdownChange(next);
+      // 在光标当前位置插入（而非追加到末尾），符合「插到我点的地方」的意图。
+      editor.insertMarkdown(snippet);
+      onMarkdownChange(editor.getMarkdown() ?? "");
 
       return;
     }
@@ -648,14 +649,6 @@ export function PostForm({
   };
 
   const uploadOne = async (item: MediaItem) => {
-    const controller = new AbortController();
-
-    setMediaItems((current) =>
-      current.map((candidate) =>
-        candidate.id === item.id ? { ...candidate, controller, progress: 0 } : candidate,
-      ),
-    );
-
     try {
       let thumbUrl = item.thumbUrl;
 
@@ -672,27 +665,93 @@ export function PostForm({
         }
       }
 
-      const formData = new FormData();
       const fileForUpload =
         item.kind === "image"
           ? await compressImageFile(item.file).catch(() => item.file)
           : item.file;
+
+      // 面板里显示压缩后的实际大小，而不是原始文件大小。
+      if (fileForUpload.size !== item.size) {
+        setMediaItems((current) =>
+          current.map((candidate) =>
+            candidate.id === item.id ? { ...candidate, size: fileForUpload.size } : candidate,
+          ),
+        );
+      }
+
+      const controller = new AbortController();
+      const xhr = new XMLHttpRequest();
+
+      setMediaItems((current) =>
+        current.map((candidate) =>
+          candidate.id === item.id
+            ? {
+                ...candidate,
+                controller,
+                abort: () => xhr.abort(),
+                progress: 0,
+              }
+            : candidate,
+        ),
+      );
+
+      const formData = new FormData();
       formData.append("file", fileForUpload);
 
-      const response = await fetch("/api/media-upload", {
-        method: "POST",
-        body: formData,
-        signal: controller.signal,
-      }).catch(() => null);
+      // 用 XHR 上传以拿到真实上传进度（fetch 不支持上传进度事件）。
+      const result = await new Promise<
+        | {
+            ok: true;
+            payload: { data?: Array<{ name: string; contentType: string; url: string }> };
+          }
+        | { ok: false }
+      >((resolve, reject) => {
+        let settled = false;
+        const finish = (action: () => void) => {
+          if (settled) {
+            return;
+          }
+          settled = true;
+          action();
+        };
 
-      if (!response?.ok) {
+        xhr.open("POST", "/api/media-upload");
+        xhr.upload.onprogress = (event) => {
+          if (event.lengthComputable) {
+            const percent = Math.round((event.loaded / event.total) * 100);
+            setMediaItems((current) =>
+              current.map((candidate) =>
+                candidate.id === item.id ? { ...candidate, progress: percent } : candidate,
+              ),
+            );
+          }
+        };
+        xhr.onload = () => {
+          let payload:
+            | { data?: Array<{ name: string; contentType: string; url: string }> }
+            | undefined;
+          try {
+            payload = JSON.parse(xhr.responseText);
+          } catch {
+            payload = undefined;
+          }
+          finish(() =>
+            resolve({
+              ok: xhr.status >= 200 && xhr.status < 300,
+              payload: payload ?? { data: [] },
+            }),
+          );
+        };
+        xhr.onerror = () => finish(() => resolve({ ok: false }));
+        xhr.onabort = () => finish(() => reject(new DOMException("Aborted", "AbortError")));
+        xhr.send(formData);
+      });
+
+      if (!result.ok) {
         throw new Error("upload failed");
       }
 
-      const payload = (await response.json().catch(() => undefined)) as
-        | { data?: Array<{ name: string; contentType: string; url: string }> }
-        | undefined;
-      const uploaded = payload?.data?.[0];
+      const uploaded = result.payload.data?.[0];
 
       if (!uploaded?.url) {
         throw new Error("no url");
@@ -753,7 +812,9 @@ export function PostForm({
   const cancelUpload = (id: string) => {
     const item = mediaItemsRef.current.find((candidate) => candidate.id === id);
 
-    if (item?.controller) {
+    if (item?.abort) {
+      item.abort();
+    } else if (item?.controller) {
       item.controller.abort();
     }
 

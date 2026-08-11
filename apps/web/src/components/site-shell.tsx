@@ -5,6 +5,7 @@ import { Button } from "@repo/ui/components/button";
 import { cn } from "@repo/ui/lib/utils";
 import { Link, useLocation } from "@tanstack/react-router";
 import {
+  type LucideIcon,
   FileTextIcon,
   HomeIcon,
   InfoIcon,
@@ -42,11 +43,9 @@ export function SiteShell({
   const { preset, nextPreset, selectPreset } = useStylePreset(settingsPreset);
   const searchLabel = locale === "zh" ? "搜索" : "Search";
   const githubLink = siteSettings.socialLinks.find(isGitHubSocialLink);
-  const navigation = getMarketingNavigation(siteSettings.navigation, locale);
-  const localizedNavigation = navigation.map((item) => ({
-    ...item,
-    href: getLocalizedDocsHref(item.href, locale),
-  }));
+  const { user } = useAuth();
+  const location = useLocation();
+  const shellNavItems = getShellNavItems(siteSettings, locale, user);
 
   usePublicPageViewTracking();
 
@@ -65,16 +64,25 @@ export function SiteShell({
             </Link>
           ) : null}
 
-          <nav className="hidden items-center gap-6 md:flex">
-            {localizedNavigation.map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                className="text-sm font-semibold text-foreground transition hover:text-muted-foreground"
-              >
-                {item.label}
-              </a>
-            ))}
+          <nav className="hidden items-center gap-1 md:flex">
+            {shellNavItems.map((item) => {
+              const Icon = item.icon;
+              const active = isActiveMobilePath(location.pathname, item.href);
+              return (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  aria-current={active ? "page" : undefined}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm font-medium transition-colors",
+                    active ? "text-foreground" : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  <Icon className="size-4" />
+                  <span>{item.label}</span>
+                </a>
+              );
+            })}
           </nav>
 
           <div className="flex shrink-0 items-center gap-1.5">
@@ -102,78 +110,57 @@ export function SiteShell({
       <StylePresetRuntimeScript initialPreset={preset} locale={locale} />
 
       <main className="flex-1 pb-20 md:pb-0">{children}</main>
-      <MobileTabBar locale={locale} />
+      <MobileTabBar items={shellNavItems} location={location} />
     </div>
   );
 }
 
-type ShellNavigationItem = SiteSettings["navigation"][number];
+type ShellNavItem = {
+  readonly href: string;
+  readonly label: string;
+  readonly icon: LucideIcon;
+};
 
-const defaultMarketingNavigation: ShellNavigationItem[] = [
-  { label: "Docs", href: "/docs", i18n: { label: { zh: "文档" } } },
-  { label: "Articles", href: "/blog", i18n: { label: { zh: "文章" } } },
-  { label: "About", href: "/about", i18n: { label: { zh: "关于" } } },
-];
-
-function getMarketingNavigation(
-  configuredNavigation: ShellNavigationItem[],
+function getShellNavItems(
+  siteSettings: SiteSettings,
   locale: ReturnType<typeof getCurrentLocale>,
-) {
-  const navigation =
-    configuredNavigation.length && !isLegacyStarterNavigation(configuredNavigation)
-      ? configuredNavigation
-      : defaultMarketingNavigation;
-
-  return navigation.map((item) => ({
-    ...item,
-    label: item.i18n?.label?.[locale] ?? item.label,
-  }));
-}
-
-function isLegacyStarterNavigation(navigation: ShellNavigationItem[]) {
-  const legacyPaths = ["/blog", "/docs", "/series", "/tags", "/about"];
-
-  return (
-    navigation.length === legacyPaths.length &&
-    legacyPaths.every((path, index) => navigation[index]?.href === path)
-  );
-}
-
-function MobileTabBar({ locale }: { readonly locale: ReturnType<typeof getCurrentLocale> }) {
-  const { user } = useAuth();
-  const location = useLocation();
+  user: { id?: string } | null | undefined,
+): ShellNavItem[] {
   const docsHref = getLocalizedDocsHref("/docs", locale);
-  const items = [
-    {
-      href: "/",
-      label: locale === "zh" ? "首页" : "Home",
-      icon: HomeIcon,
-    },
-    {
-      href: docsHref,
-      label: locale === "zh" ? "文档" : "Docs",
-      icon: FileTextIcon,
-    },
-    {
-      href: "/blog",
-      label: locale === "zh" ? "文章" : "Articles",
-      icon: SearchIcon,
-    },
-    {
-      href: "/about",
-      label: locale === "zh" ? "关于" : "About",
-      icon: InfoIcon,
-    },
-    {
-      href: user ? "/app" : "/login",
-      label: user ? m.account_title() : m.login(),
-      icon: UserCircleIcon,
-    },
+  const items: ShellNavItem[] = [
+    { href: "/", label: locale === "zh" ? "首页" : "Home", icon: HomeIcon },
+    { href: "/blog", label: locale === "zh" ? "文章" : "Articles", icon: SearchIcon },
+    { href: "/about", label: locale === "zh" ? "关于" : "About", icon: InfoIcon },
   ];
 
+  if (siteSettings.showDocsNav !== false) {
+    items.push({ href: docsHref, label: locale === "zh" ? "文档" : "Docs", icon: FileTextIcon });
+  }
+
+  items.push({
+    href: user ? "/app" : "/login",
+    label: user ? m.account_title() : m.login(),
+    icon: UserCircleIcon,
+  });
+
+  return items;
+}
+
+function MobileTabBar({
+  items,
+  location,
+}: {
+  readonly items: ShellNavItem[];
+  readonly location: ReturnType<typeof useLocation>;
+}) {
   return (
     <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/95 px-2 pt-1.5 pb-[max(env(safe-area-inset-bottom),0.5rem)] shadow-[0_-12px_30px_rgba(0,0,0,0.08)] backdrop-blur-xl md:hidden">
-      <div className="mx-auto grid max-w-md grid-cols-5 gap-1">
+      <div
+        className={cn(
+          "mx-auto grid max-w-md gap-1",
+          items.length === 5 ? "grid-cols-5" : "grid-cols-4",
+        )}
+      >
         {items.map((item) => {
           const Icon = item.icon;
           const active = isActiveMobilePath(location.pathname, item.href);
@@ -182,9 +169,10 @@ function MobileTabBar({ locale }: { readonly locale: ReturnType<typeof getCurren
             <a
               key={item.href}
               href={item.href}
+              aria-current={active ? "page" : undefined}
               className={cn(
-                "flex min-h-12 flex-col items-center justify-center gap-1 rounded-md px-1 text-[11px] leading-none font-semibold text-muted-foreground transition",
-                active && "bg-foreground text-background",
+                "flex min-h-12 flex-col items-center justify-center gap-1 rounded-md px-1 text-[11px] leading-none font-medium transition-colors",
+                active ? "font-semibold text-foreground" : "text-muted-foreground",
               )}
             >
               <Icon className="size-4" />

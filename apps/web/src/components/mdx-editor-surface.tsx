@@ -128,7 +128,7 @@ export function MdxEditorSurface({
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-md border border-border bg-background shadow-xs",
+        "max-h-[70vh] overflow-x-hidden overflow-y-auto rounded-md border border-border bg-background shadow-xs",
         className,
       )}
     >

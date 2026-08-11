@@ -99,8 +99,6 @@ function BlogIndexPage() {
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="max-w-3xl">
           <p className="text-sm font-semibold text-link uppercase">{m.blog_eyebrow()}</p>
-          <h1 className="mt-3 text-4xl font-semibold sm:text-5xl">{m.blog_title()}</h1>
-          <p className="mt-4 text-base leading-7 text-muted-foreground">{m.blog_description()}</p>
         </div>
         <form className="mt-8 grid gap-4 rounded-lg border border-border/80 bg-card p-4 shadow-xs md:grid-cols-[minmax(0,1fr)_auto]">
           {search.tag ? <input type="hidden" name="tag" value={search.tag} /> : null}

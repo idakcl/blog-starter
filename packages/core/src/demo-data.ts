@@ -36,6 +36,7 @@ export const siteSettings: SiteSettings = {
   layoutPreset: "shelf",
   locales: ["en", "zh"],
   primaryLanguage: "en",
+  showDocsNav: true,
   i18n: {
     description: {
       zh: "基于 Cloudflare 的个人站点，用来沉淀文章、视频、长期笔记和 API 辅助发布工作流。",

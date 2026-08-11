@@ -156,6 +156,7 @@ function AdminSettingsPage() {
     layoutPreset: "journal",
     locales: ["en", "zh"],
     primaryLanguage: "en",
+    showDocsNav: true,
   };
   const [siteSettings, setSiteSettings] = useState<SiteSettings>(defaultSettings);
   const [emailStatus, setEmailStatus] = useState<EmailVerificationStatus>(
@@ -265,6 +266,7 @@ function AdminSettingsPage() {
           emailStatus.delivery.configured && formData.get("manualEmailBroadcastsEnabled") === "on",
         indexingEnabled: formData.get("indexingEnabled") === "on",
         layoutPreset: formData.get("layoutPreset"),
+        showDocsNav: formData.get("showDocsNav") === "on",
       }),
     }).catch(() => null);
 
@@ -801,6 +803,15 @@ function AdminSettingsPage() {
                   className="size-4 rounded border-input"
                 />
                 {m.admin_settings_indexing()}
+              </label>
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  name="showDocsNav"
+                  defaultChecked={siteSettings.showDocsNav}
+                  className="size-4 rounded border-input"
+                />
+                {locale === "zh" ? "导航栏显示“文档”标签" : "Show “Docs” tab in navigation"}
               </label>
             </div>
             <fieldset className="grid gap-3 rounded-md border border-border bg-muted/35 p-4 md:col-span-2">

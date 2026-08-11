@@ -175,6 +175,7 @@ export type SiteSettings = {
   layoutPreset: LayoutPreset;
   locales: SupportedLocale[];
   primaryLanguage: SupportedLocale;
+  showDocsNav: boolean;
   i18n?: LocalizedFields<"name" | "description" | "authorBio">;
 };
 

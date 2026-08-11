@@ -113,6 +113,7 @@ export type SiteSettingsInput = Partial<
     | "themePreset"
     | "layoutPreset"
     | "primaryLanguage"
+    | "showDocsNav"
     | "i18n"
   >
 > & {
@@ -313,6 +314,7 @@ export function normalizeSiteSettings(
     layoutPreset: normalizeLayoutPreset(input.layoutPreset, base.layoutPreset),
     locales: ["en", "zh"],
     primaryLanguage,
+    showDocsNav: input.showDocsNav ?? base.showDocsNav,
     i18n: {
       ...base.i18n,
       ...input.i18n,
