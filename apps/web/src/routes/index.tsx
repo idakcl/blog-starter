@@ -14,13 +14,17 @@ import { $getHomePageData, type HomePageData } from "#/lib/cms-server";
 import { getCurrentLocale } from "#/lib/i18n";
 import { m } from "#/paraglide/messages.js";
 
+// 首页固定显示的网站简介（不读取后台设置，保持与意图一致）。
+const SITE_DESCRIPTION =
+  "基于 Cloudflare 的个人站点，用来沉淀文章、视频、长期笔记和 API 辅助发布工作流。";
+
 export const Route = createFileRoute("/")({
   loader: (): Promise<HomePageData> => $getHomePageData(),
   head: ({ loaderData }) => {
     const settings = loaderData?.siteSettings;
     const siteUrl = (settings?.url ?? "").replace(/\/$/, "");
     const title = settings?.name ?? "Blog";
-    const description = settings?.description ?? "";
+    const description = SITE_DESCRIPTION;
     const image = settings?.defaultOgImage?.trim()
       ? absoluteOgUrl(settings.defaultOgImage.trim(), siteUrl)
       : "";
@@ -115,15 +119,10 @@ function HomePage() {
   const siteSettings = localizeSiteSettings(data.siteSettings, locale);
 
   return (
-    <SiteShell siteSettings={siteSettings} showBrand={false}>
+    <SiteShell siteSettings={siteSettings} showBrand={true}>
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <div className="mb-10">
-          <h1 className="text-3xl font-semibold tracking-tight">{siteSettings.name}</h1>
-          {siteSettings.description ? (
-            <p className="mt-3 max-w-2xl leading-7 text-muted-foreground">
-              {siteSettings.description}
-            </p>
-          ) : null}
+          <p className="max-w-2xl leading-7 text-muted-foreground">{SITE_DESCRIPTION}</p>
         </div>
         {posts.length ? (
           <div className="grid gap-6">

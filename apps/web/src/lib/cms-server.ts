@@ -57,6 +57,7 @@ export type SiteSettingsPageData = {
 
 export type AboutPageData = {
   siteSettings: SiteSettings;
+  post: Post | null;
 };
 
 export const $getBlogPostPage = createServerFn({ method: "GET" })
@@ -246,10 +247,12 @@ export const $getSiteSettings = createServerFn({ method: "GET" }).handler(
 
 export const $getAboutPageData = createServerFn({ method: "GET" }).handler(
   async (): Promise<AboutPageData> => {
-    const { getD1SiteSettings } = await import("./cms-d1");
+    const { getD1PostBySlug, getD1SiteSettings } = await import("./cms-d1");
+    const [siteSettings, post] = await Promise.all([getD1SiteSettings(), getD1PostBySlug("About")]);
 
     return {
-      siteSettings: await getD1SiteSettings(),
+      siteSettings,
+      post: post ?? null,
     };
   },
 );
