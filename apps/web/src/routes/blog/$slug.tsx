@@ -11,7 +11,7 @@ import { Button } from "@repo/ui/components/button";
 import { cn } from "@repo/ui/lib/utils";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { MessageSquareIcon, PencilLineIcon, RssIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { CommentForm } from "#/components/comment-form";
 import { SiteShell } from "#/components/site-shell";
@@ -116,6 +116,7 @@ function BlogPostPage() {
   const { user } = useAuth();
   const [replyTarget, setReplyTarget] = useState<Comment | null>(null);
   const [submittedComments, setSubmittedComments] = useState<Comment[]>([]);
+  const articleRef = useRef<HTMLDivElement>(null);
 
   const handleReply = (comment: Comment) => {
     setReplyTarget(comment);
@@ -145,6 +146,40 @@ function BlogPostPage() {
     : null;
   const articleBody = buildArticleBody(localizedPost.contentHtml);
   const editLabel = locale === "zh" ? "编辑文章" : m.admin_posts_edit();
+
+  // 文章里的视频：若没有 poster（旧文章 / 首帧捕获失败），用 JS 截取第一帧作为背景海报。
+  useEffect(() => {
+    const root = articleRef.current;
+    if (!root) return;
+    const videos = Array.from(root.querySelectorAll("video")) as HTMLVideoElement[];
+    videos.forEach((video) => {
+      if (video.poster) return; // 已有首帧海报（来自 #poster=），无需兜底
+      const captureFrame = () => {
+        try {
+          const canvas = document.createElement("canvas");
+          canvas.width = video.videoWidth || 480;
+          canvas.height = video.videoHeight || 270;
+          const ctx = canvas.getContext("2d");
+          if (ctx) {
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            video.poster = canvas.toDataURL("image/jpeg", 0.85);
+          }
+        } catch {
+          // 跨域视频且未配置 CORS 时画布会被污染，截图失败属正常，忽略即可
+        }
+      };
+      const seekToFirstFrame = () => {
+        try {
+          video.currentTime = 0.1;
+        } catch {
+          captureFrame();
+        }
+      };
+      video.addEventListener("loadeddata", seekToFirstFrame, { once: true });
+      video.addEventListener("seeked", captureFrame, { once: true });
+      if (video.readyState >= 1) seekToFirstFrame();
+    });
+  }, [articleBody.html]);
   const coverImage = resolvePostCoverImage(localizedPost.coverImage);
 
   // 未勾选“显示在博客列表”的文章，仅管理员可见；其他访客看到提示而不是正文。
@@ -311,7 +346,8 @@ function BlogPostPage() {
             ) : null}
 
             <div
-              className="prose prose-neutral prose-a:text-link prose-headings:scroll-mt-24 prose-headings:font-semibold dark:prose-invert max-w-none leading-8 [&_img]:max-w-full [&_pre]:overflow-x-auto [&_table]:block [&_table]:max-w-full [&_table]:overflow-x-auto [&>h1:first-child]:hidden"
+              ref={articleRef}
+              className="prose prose-neutral prose-a:text-link prose-headings:scroll-mt-24 prose-headings:font-semibold dark:prose-invert max-w-none leading-8 [&_img]:max-w-full [&_pre]:overflow-x-auto [&_table]:block [&_table]:max-w-full [&_table]:overflow-x-auto [&_video]:aspect-video [&_video]:w-full [&_video]:rounded-xl [&_video]:bg-black/5 [&_video]:object-cover [&>h1:first-child]:hidden"
               dangerouslySetInnerHTML={{ __html: articleBody.html }}
             />
 
