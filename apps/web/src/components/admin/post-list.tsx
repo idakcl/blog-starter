@@ -48,6 +48,7 @@ interface PostListProps {
   hiddenCount: number;
   onHiddenFilterChange: (value: boolean) => void;
   onShowInList: (post: Post) => void;
+  onHidePost?: (post: Post) => void;
 }
 
 export function PostList({
@@ -73,6 +74,7 @@ export function PostList({
   hiddenCount,
   onHiddenFilterChange,
   onShowInList,
+  onHidePost,
 }: PostListProps) {
   const statusDetails = statusOptions
     .filter((status): status is Exclude<ContentStatus, "deleted"> => status !== "all")
@@ -290,45 +292,68 @@ export function PostList({
                       >
                         {m.admin_posts_edit()}
                       </Button>
-                      {!isObsidianPost && post.status !== "published" ? (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => onChangePostStatus(post, "published")}
-                        >
-                          <SendIcon />
-                          {m.admin_publish_post()}
-                        </Button>
+                      {!isObsidianPost && !post.listed ? (
+                        <>
+                          {(["draft", "published", "archived"] as const).map((status) => (
+                            <Button
+                              key={status}
+                              size="sm"
+                              variant={post.status === status ? "default" : "outline"}
+                              aria-pressed={post.status === status}
+                              onClick={() => onChangePostStatus(post, status)}
+                            >
+                              {getPostStatusCopy(status).label}
+                            </Button>
+                          ))}
+                          <Button size="sm" variant="outline" onClick={() => onShowInList(post)}>
+                            <EyeIcon />
+                            {m.admin_posts_show_in_list()}
+                          </Button>
+                        </>
                       ) : null}
-                      {!isObsidianPost && post.status !== "draft" ? (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => onChangePostStatus(post, "draft")}
-                        >
-                          <FileTextIcon />
-                          {m.admin_posts_move_to_draft()}
-                        </Button>
-                      ) : null}
-                      {!isObsidianPost && post.status !== "archived" ? (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => onChangePostStatus(post, "archived")}
-                        >
-                          <ArchiveIcon />
-                          {m.admin_posts_archive()}
-                        </Button>
+                      {!isObsidianPost && post.listed ? (
+                        <>
+                          {post.status !== "published" ? (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => onChangePostStatus(post, "published")}
+                            >
+                              <SendIcon />
+                              {m.admin_publish_post()}
+                            </Button>
+                          ) : null}
+                          {post.status !== "draft" ? (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => onChangePostStatus(post, "draft")}
+                            >
+                              <FileTextIcon />
+                              {m.admin_posts_move_to_draft()}
+                            </Button>
+                          ) : null}
+                          {post.status !== "archived" ? (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => onChangePostStatus(post, "archived")}
+                            >
+                              <ArchiveIcon />
+                              {m.admin_posts_archive()}
+                            </Button>
+                          ) : null}
+                          {onHidePost ? (
+                            <Button size="sm" variant="outline" onClick={() => onHidePost(post)}>
+                              <EyeOffIcon />
+                              {m.admin_posts_hide()}
+                            </Button>
+                          ) : null}
+                        </>
                       ) : null}
                       {!isObsidianPost ? (
                         <Button size="sm" variant="destructive" onClick={() => onDeletePost(post)}>
                           {m.admin_posts_delete()}
-                        </Button>
-                      ) : null}
-                      {!isObsidianPost && !post.listed ? (
-                        <Button size="sm" variant="outline" onClick={() => onShowInList(post)}>
-                          <EyeIcon />
-                          {m.admin_posts_show_in_list()}
                         </Button>
                       ) : null}
                     </div>

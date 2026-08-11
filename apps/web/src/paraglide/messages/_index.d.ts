@@ -1569,6 +1569,20 @@ export const admin_posts_hidden_badge: ((inputs?: Admin_Posts_Hidden_BadgeInputs
 /**
 * | output |
 * | --- |
+* | "Hide" |
+*
+* @param {Admin_Posts_HideInputs} inputs
+* @param {{ locale?: "en" | "zh" }} options
+* @returns {LocalizedString}
+*/
+export const admin_posts_hide: ((inputs?: Admin_Posts_HideInputs, options?: {
+    locale?: "en" | "zh";
+}) => LocalizedString) & import("../runtime.js").MessageMetadata<Admin_Posts_HideInputs, {
+    locale?: "en" | "zh";
+}, {}>;
+/**
+* | output |
+* | --- |
 * | "Public URL" |
 *
 * @param {Admin_Posts_Public_UrlInputs} inputs
@@ -5119,6 +5133,7 @@ export type Admin_Posts_Not_PublicInputs = {};
 export type Admin_Posts_Show_HiddenInputs = {};
 export type Admin_Posts_Show_In_ListInputs = {};
 export type Admin_Posts_Hidden_BadgeInputs = {};
+export type Admin_Posts_HideInputs = {};
 export type Admin_Posts_Public_UrlInputs = {};
 export type Admin_Posts_SearchInputs = {};
 export type Admin_Posts_Select_AllInputs = {};

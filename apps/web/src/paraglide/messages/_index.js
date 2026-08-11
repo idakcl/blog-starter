@@ -114,6 +114,7 @@ import { getLocale, experimentalStaticLocale } from "../runtime.js"
 /** @typedef {{}} Admin_Posts_Show_HiddenInputs */
 /** @typedef {{}} Admin_Posts_Show_In_ListInputs */
 /** @typedef {{}} Admin_Posts_Hidden_BadgeInputs */
+/** @typedef {{}} Admin_Posts_HideInputs */
 /** @typedef {{}} Admin_Posts_Public_UrlInputs */
 /** @typedef {{}} Admin_Posts_SearchInputs */
 /** @typedef {{}} Admin_Posts_Select_AllInputs */
@@ -1928,6 +1929,20 @@ export const admin_posts_hidden_badge = /** @type {((inputs?: Admin_Posts_Hidden
 	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
 	if (locale === "en") return __en.admin_posts_hidden_badge(inputs)
 	return __zh.admin_posts_hidden_badge(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Hide" |
+*
+* @param {Admin_Posts_HideInputs} inputs
+* @param {{ locale?: "en" | "zh" }} options
+* @returns {LocalizedString}
+*/
+export const admin_posts_hide = /** @type {((inputs?: Admin_Posts_HideInputs, options?: { locale?: "en" | "zh" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Admin_Posts_HideInputs, { locale?: "en" | "zh" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.admin_posts_hide(inputs)
+	return __zh.admin_posts_hide(inputs)
 });
 /**
 * | output |

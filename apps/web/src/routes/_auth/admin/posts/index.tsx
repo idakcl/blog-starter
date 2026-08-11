@@ -169,6 +169,27 @@ function AdminPostsPage() {
     toast.success(copy.showInListSuccess(post.title));
   };
 
+  const hidePost = async (post: Post) => {
+    const response = await fetch(`/api/posts/${post.id}?lang=${locale}`, {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ listed: false }),
+    }).catch(() => null);
+
+    if (!response?.ok) {
+      toast.error(copy.hideError, {
+        description: response
+          ? await getResponseErrorMessage(response, copy.hideError)
+          : copy.networkError,
+      });
+      return;
+    }
+
+    const payload = (await response.json()) as { data: Post };
+    upsertPost(payload.data);
+    toast.success(copy.hideSuccess(post.title));
+  };
+
   const toggleAllVisiblePosts = (checked: boolean) => {
     const visibleIds = visiblePosts.map((post) => post.id);
 
@@ -256,6 +277,7 @@ function AdminPostsPage() {
         hiddenCount={hiddenCount}
         onHiddenFilterChange={setHiddenFilter}
         onShowInList={(post) => void changePostListed(post, true)}
+        onHidePost={(post) => void hidePost(post)}
       />
     </section>
   );
@@ -285,6 +307,8 @@ function getAdminPostsCopy(locale: "en" | "zh") {
       networkError: "网络异常，请稍后再试。",
       showInListError: "操作失败，请重试。",
       showInListSuccess: (title: string) => `“${title}”已重新显示到公开列表`,
+      hideError: "操作失败，请重试。",
+      hideSuccess: (title: string) => `“${title}”已隐藏，不再显示在公开列表`,
       statusError: (status: ContentStatus) =>
         status === "published"
           ? "文章发布失败"
@@ -322,6 +346,8 @@ function getAdminPostsCopy(locale: "en" | "zh") {
     networkError: "Network error. Try again in a moment.",
     showInListError: "Could not update the post. Try again.",
     showInListSuccess: (title: string) => `"${title}" is now shown in the public list`,
+    hideError: "Could not update the post. Try again.",
+    hideSuccess: (title: string) => `"${title}" is now hidden from the public list`,
     statusError: (status: ContentStatus) =>
       status === "published"
         ? "Post could not be published"

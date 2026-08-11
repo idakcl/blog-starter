@@ -111,6 +111,7 @@
   "admin_posts_show_hidden": "隐藏的文章",
   "admin_posts_show_in_list": "显示在列表",
   "admin_posts_hidden_badge": "隐藏",
+  "admin_posts_hide": "隐藏",
   "admin_posts_public_url": "公开地址",
   "admin_posts_search": "搜索文章",
   "admin_posts_select_all": "选择当前可见文章",

@@ -112,6 +112,7 @@
 /** @typedef {{}} Admin_Posts_Show_HiddenInputs */
 /** @typedef {{}} Admin_Posts_Show_In_ListInputs */
 /** @typedef {{}} Admin_Posts_Hidden_BadgeInputs */
+/** @typedef {{}} Admin_Posts_HideInputs */
 /** @typedef {{}} Admin_Posts_Public_UrlInputs */
 /** @typedef {{}} Admin_Posts_SearchInputs */
 /** @typedef {{}} Admin_Posts_Select_AllInputs */
@@ -805,6 +806,10 @@ export const admin_posts_show_in_list = /** @type {(inputs: Admin_Posts_Show_In_
 
 export const admin_posts_hidden_badge = /** @type {(inputs: Admin_Posts_Hidden_BadgeInputs) => LocalizedString} */ () => {
 	return /** @type {LocalizedString} */ (`Hidden`)
+};
+
+export const admin_posts_hide = /** @type {(inputs: Admin_Posts_HideInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Hide`)
 };
 
 export const admin_posts_public_url = /** @type {(inputs: Admin_Posts_Public_UrlInputs) => LocalizedString} */ () => {
