@@ -12,6 +12,7 @@ import { ArrowRightIcon } from "lucide-react";
 import { SiteShell } from "#/components/site-shell";
 import { $getHomePageData, type HomePageData } from "#/lib/cms-server";
 import { getCurrentLocale } from "#/lib/i18n";
+import { resolvePostCoverImage } from "#/lib/post-cover-image";
 import { m } from "#/paraglide/messages.js";
 
 export const Route = createFileRoute("/")({
@@ -119,37 +120,55 @@ function HomePage() {
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         {posts.length ? (
           <div className="grid gap-6">
-            {posts.map((post) => (
-              <article key={post.id} className="border-b border-border pb-6 last:border-0">
-                <time dateTime={post.publishedAt} className="text-sm text-muted-foreground">
-                  {formatDate(post.publishedAt, locale)}
-                </time>
-                <Link to="/blog/$slug" params={{ slug: post.slug }} className="group mt-1 block">
-                  <h3 className="text-xl font-semibold transition-colors group-hover:text-link">
-                    {post.title}
-                  </h3>
-                </Link>
-                {post.excerpt ? (
-                  <p className="mt-2 line-clamp-2 leading-relaxed text-muted-foreground">
-                    {post.excerpt}
-                  </p>
-                ) : null}
-                {post.tags.length ? (
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {post.tags.map((tag) => (
-                      <Link
-                        key={tag.slug}
-                        to="/tags/$slug"
-                        params={{ slug: tag.slug }}
-                        className="text-xs text-muted-foreground transition-colors hover:text-link"
-                      >
-                        #{tag.name}
-                      </Link>
-                    ))}
-                  </div>
-                ) : null}
-              </article>
-            ))}
+            {posts.map((post) => {
+              const coverImage = resolvePostCoverImage(post.coverImage);
+
+              return (
+                <article key={post.id} className="border-b border-border pb-6 last:border-0">
+                  {coverImage ? (
+                    <Link
+                      to="/blog/$slug"
+                      params={{ slug: post.slug }}
+                      className="group mb-3 block overflow-hidden rounded-md border border-border/70 bg-muted"
+                    >
+                      <img
+                        src={coverImage}
+                        alt=""
+                        loading="lazy"
+                        className="aspect-[16/7] w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                      />
+                    </Link>
+                  ) : null}
+                  <time dateTime={post.publishedAt} className="text-sm text-muted-foreground">
+                    {formatDate(post.publishedAt, locale)}
+                  </time>
+                  <Link to="/blog/$slug" params={{ slug: post.slug }} className="group mt-1 block">
+                    <h3 className="text-xl font-semibold transition-colors group-hover:text-link">
+                      {post.title}
+                    </h3>
+                  </Link>
+                  {post.excerpt ? (
+                    <p className="mt-2 line-clamp-2 leading-relaxed text-muted-foreground">
+                      {post.excerpt}
+                    </p>
+                  ) : null}
+                  {post.tags.length ? (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {post.tags.map((tag) => (
+                        <Link
+                          key={tag.slug}
+                          to="/tags/$slug"
+                          params={{ slug: tag.slug }}
+                          className="text-xs text-muted-foreground transition-colors hover:text-link"
+                        >
+                          #{tag.name}
+                        </Link>
+                      ))}
+                    </div>
+                  ) : null}
+                </article>
+              );
+            })}
           </div>
         ) : (
           <p className="py-8 text-center text-muted-foreground">

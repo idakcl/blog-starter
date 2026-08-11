@@ -1,4 +1,3 @@
-import { getSiteSettingsForLocale } from "@repo/core";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
@@ -7,7 +6,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { BookOpenIcon, LoaderCircleIcon } from "lucide-react";
 import { toast } from "sonner";
 
-import { getCurrentLocale } from "#/lib/i18n";
 import { m } from "#/paraglide/messages.js";
 
 export const Route = createFileRoute("/_guest/reset-password")({
@@ -15,7 +13,7 @@ export const Route = createFileRoute("/_guest/reset-password")({
 });
 
 function ResetPasswordForm() {
-  const siteSettings = getSiteSettingsForLocale(getCurrentLocale());
+  const { siteSettings } = Route.useRouteContext();
   const token =
     typeof window === "undefined" ? "" : new URLSearchParams(window.location.search).get("token");
   const requestReset = useMutation({

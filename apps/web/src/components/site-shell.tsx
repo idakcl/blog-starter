@@ -107,7 +107,7 @@ export function SiteShell({
       </header>
       <StylePresetRuntimeScript initialPreset={preset} locale={locale} />
 
-      <main className="flex-1 pb-20 md:pb-0">{children}</main>
+      <main className="min-w-0 flex-1 pb-20 md:pb-0">{children}</main>
       <MobileTabBar items={shellNavItems} location={location} />
     </div>
   );

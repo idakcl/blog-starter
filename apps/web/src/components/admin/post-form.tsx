@@ -563,8 +563,13 @@ export function PostForm({
 
     if (editor) {
       // 在光标当前位置插入（而非追加到末尾），符合「插到我点的地方」的意图。
-      editor.insertMarkdown(snippet);
-      onMarkdownChange(editor.getMarkdown() ?? "");
+      // MDXEditor 的 insertMarkdown 仅在编辑器“有选区”时生效，且失焦状态下首次
+      // 插入后会清空选区（$setSelection(null)），导致后续图片全部插不进去、
+      // 最终只显示第一张。因此先 focus()，待选区就绪的回调里再插入。
+      editor.focus(() => {
+        editor.insertMarkdown(snippet);
+        onMarkdownChange(editor.getMarkdown() ?? "");
+      });
 
       return;
     }
@@ -781,8 +786,8 @@ export function PostForm({
 
       const snippet =
         item.kind === "video" && posterUrl
-          ? `![${uploaded.name}](${uploaded.url}#poster=${encodePosterParam(posterUrl)})`
-          : `![${uploaded.name}](${uploaded.url})`;
+          ? `![${uploaded.name}](${uploaded.url}#poster=${encodePosterParam(posterUrl)})\n`
+          : `![${uploaded.name}](${uploaded.url})\n`;
       insertMediaSnippet(snippet);
     } catch (error) {
       const canceled = error instanceof DOMException && error.name === "AbortError";

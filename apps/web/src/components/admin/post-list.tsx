@@ -210,179 +210,126 @@ export function PostList({
 
       <PostBatchActions selectedCount={selectedPostIds.length} onAction={onBatchAction} />
 
-      <AdminTableFrame className="mt-4">
-        <table className="w-full min-w-[1040px] text-left text-sm">
-          <thead className="bg-muted/55 text-xs text-muted-foreground uppercase">
-            <tr>
-              <th className="px-3 py-2.5">
-                <input
-                  type="checkbox"
-                  checked={allVisibleSelected}
-                  onChange={(event) => onToggleAll(event.currentTarget.checked)}
-                  aria-label={m.admin_posts_select_all()}
-                  className="size-4 rounded border-input"
-                />
-              </th>
-              <th className="px-3 py-2.5">{m.admin_posts_column_title()}</th>
-              <th className="px-3 py-2.5">{m.admin_posts_status()}</th>
-              <th className="px-3 py-2.5">{m.admin_series_title()}</th>
-              <th className="px-3 py-2.5">{m.admin_posts_source()}</th>
-              <th className="px-3 py-2.5">{m.admin_posts_updated()}</th>
-              <th className="px-3 py-2.5">{m.admin_posts_public_url()}</th>
-              <th className="px-3 py-2.5">{m.admin_posts_actions()}</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border/80">
-            {visiblePosts.map((post) => {
-              const statusCopy = getPostStatusCopy(post.status);
-              const publiclyVisible = isPostPubliclyVisible(post);
-              const isObsidianPost = post.externalSource?.kind === "obsidian_git";
+      <div className="mt-4 hidden lg:block">
+        <AdminTableFrame>
+          <table className="w-full min-w-[1040px] text-left text-sm">
+            <thead className="bg-muted/55 text-xs text-muted-foreground uppercase">
+              <tr>
+                <th className="px-3 py-2.5">
+                  <input
+                    type="checkbox"
+                    checked={allVisibleSelected}
+                    onChange={(event) => onToggleAll(event.currentTarget.checked)}
+                    aria-label={m.admin_posts_select_all()}
+                    className="size-4 rounded border-input"
+                  />
+                </th>
+                <th className="px-3 py-2.5">{m.admin_posts_column_title()}</th>
+                <th className="px-3 py-2.5">{m.admin_posts_status()}</th>
+                <th className="px-3 py-2.5">{m.admin_series_title()}</th>
+                <th className="px-3 py-2.5">{m.admin_posts_source()}</th>
+                <th className="px-3 py-2.5">{m.admin_posts_updated()}</th>
+                <th className="px-3 py-2.5">{m.admin_posts_public_url()}</th>
+                <th className="px-3 py-2.5">{m.admin_posts_actions()}</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border/80">
+              {visiblePosts.map((post) => {
+                const statusCopy = getPostStatusCopy(post.status);
+                const publiclyVisible = isPostPubliclyVisible(post);
+                const isObsidianPost = post.externalSource?.kind === "obsidian_git";
 
-              return (
-                <tr key={post.id}>
-                  <td className="px-3 py-3">
-                    <input
-                      type="checkbox"
-                      checked={selectedPostIds.includes(post.id)}
-                      onChange={(event) => onTogglePost(post.id, event.currentTarget.checked)}
-                      aria-label={m.admin_posts_select_one({ title: post.title })}
-                      className="size-4 rounded border-input"
-                    />
-                  </td>
-                  <td className="px-3 py-3 font-medium">
-                    <div className="grid gap-1">
-                      <span>{post.title}</span>
-                      {post.pinned || post.featured ? (
-                        <div className="flex flex-wrap gap-1.5">
-                          {post.pinned ? (
-                            <span className="rounded-sm border border-border bg-card px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground">
-                              {m.pinned()}
-                            </span>
-                          ) : null}
-                          {post.featured ? (
-                            <span className="rounded-sm border border-border bg-card px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground">
-                              {m.featured()}
-                            </span>
-                          ) : null}
-                        </div>
-                      ) : null}
-                      {!post.listed ? (
-                        <span className="rounded-sm border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-[11px] font-medium text-amber-600 dark:text-amber-400">
-                          {m.admin_posts_hidden_badge()}
-                        </span>
-                      ) : null}
-                    </div>
-                  </td>
-                  <td className="px-3 py-3">
-                    <span
-                      className="rounded-sm bg-accent px-2 py-1 text-xs font-medium text-accent-foreground"
-                      title={statusCopy.description}
-                    >
-                      {statusCopy.label}
-                    </span>
-                  </td>
-                  <td className="px-3 py-3 text-muted-foreground">
-                    {post.series?.name ?? m.admin_posts_no_series()}
-                  </td>
-                  <td className="px-3 py-3 text-muted-foreground">
-                    {isObsidianPost ? "Obsidian" : post.source}
-                  </td>
-                  <td className="px-3 py-3 text-muted-foreground">{post.updatedAt.slice(0, 10)}</td>
-                  <td className="px-3 py-3">
-                    {publiclyVisible ? (
-                      <Link
-                        to="/blog/$slug"
-                        params={{ slug: post.slug }}
-                        className="text-link hover:underline"
+                return (
+                  <tr key={post.id}>
+                    <td className="px-3 py-3">
+                      <input
+                        type="checkbox"
+                        checked={selectedPostIds.includes(post.id)}
+                        onChange={(event) => onTogglePost(post.id, event.currentTarget.checked)}
+                        aria-label={m.admin_posts_select_one({ title: post.title })}
+                        className="size-4 rounded border-input"
+                      />
+                    </td>
+                    <td className="px-3 py-3 font-medium">
+                      <div className="grid gap-1">
+                        <span>{post.title}</span>
+                        {post.pinned || post.featured ? (
+                          <div className="flex flex-wrap gap-1.5">
+                            {post.pinned ? (
+                              <span className="rounded-sm border border-border bg-card px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground">
+                                {m.pinned()}
+                              </span>
+                            ) : null}
+                            {post.featured ? (
+                              <span className="rounded-sm border border-border bg-card px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground">
+                                {m.featured()}
+                              </span>
+                            ) : null}
+                          </div>
+                        ) : null}
+                        {!post.listed ? (
+                          <span className="rounded-sm border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-[11px] font-medium text-amber-600 dark:text-amber-400">
+                            {m.admin_posts_hidden_badge()}
+                          </span>
+                        ) : null}
+                      </div>
+                    </td>
+                    <td className="px-3 py-3">
+                      <span
+                        className="rounded-sm bg-accent px-2 py-1 text-xs font-medium text-accent-foreground"
+                        title={statusCopy.description}
                       >
-                        {m.admin_posts_view()}
-                      </Link>
-                    ) : (
-                      <span className="text-muted-foreground">{m.admin_posts_not_public()}</span>
-                    )}
-                  </td>
-                  <td className="px-3 py-3">
-                    <div className="flex flex-wrap gap-2">
-                      <Button
-                        render={<Link to="/admin/posts/$postId" params={{ postId: post.id }} />}
-                        nativeButton={false}
-                        size="sm"
-                        variant="outline"
-                      >
-                        {m.admin_posts_edit()}
-                      </Button>
-                      {!isObsidianPost && !post.listed ? (
-                        <>
-                          {(["draft", "published", "archived"] as const).map((status) => (
-                            <Button
-                              key={status}
-                              size="sm"
-                              variant={post.status === status ? "default" : "outline"}
-                              aria-pressed={post.status === status}
-                              onClick={() => onChangePostStatus(post, status)}
-                            >
-                              {getPostStatusCopy(status).label}
-                            </Button>
-                          ))}
-                          <Button size="sm" variant="outline" onClick={() => onShowInList(post)}>
-                            <EyeIcon />
-                            {m.admin_posts_show_in_list()}
-                          </Button>
-                        </>
-                      ) : null}
-                      {!isObsidianPost && post.listed ? (
-                        <>
-                          {post.status !== "published" ? (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => onChangePostStatus(post, "published")}
-                            >
-                              <SendIcon />
-                              {m.admin_publish_post()}
-                            </Button>
-                          ) : null}
-                          {post.status !== "draft" ? (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => onChangePostStatus(post, "draft")}
-                            >
-                              <FileTextIcon />
-                              {m.admin_posts_move_to_draft()}
-                            </Button>
-                          ) : null}
-                          {post.status !== "archived" ? (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => onChangePostStatus(post, "archived")}
-                            >
-                              <ArchiveIcon />
-                              {m.admin_posts_archive()}
-                            </Button>
-                          ) : null}
-                          {onHidePost ? (
-                            <Button size="sm" variant="outline" onClick={() => onHidePost(post)}>
-                              <EyeOffIcon />
-                              {m.admin_posts_hide()}
-                            </Button>
-                          ) : null}
-                        </>
-                      ) : null}
-                      {!isObsidianPost ? (
-                        <Button size="sm" variant="destructive" onClick={() => onDeletePost(post)}>
-                          {m.admin_posts_delete()}
-                        </Button>
-                      ) : null}
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </AdminTableFrame>
+                        {statusCopy.label}
+                      </span>
+                    </td>
+                    <td className="px-3 py-3 text-muted-foreground">
+                      {post.series?.name ?? m.admin_posts_no_series()}
+                    </td>
+                    <td className="px-3 py-3 text-muted-foreground">
+                      {isObsidianPost ? "Obsidian" : post.source}
+                    </td>
+                    <td className="px-3 py-3 text-muted-foreground">
+                      {post.updatedAt.slice(0, 10)}
+                    </td>
+                    <td className="px-3 py-3">
+                      {publiclyVisible ? (
+                        <Link
+                          to="/blog/$slug"
+                          params={{ slug: post.slug }}
+                          className="text-link hover:underline"
+                        >
+                          {m.admin_posts_view()}
+                        </Link>
+                      ) : (
+                        <span className="text-muted-foreground">{m.admin_posts_not_public()}</span>
+                      )}
+                    </td>
+                    <td className="px-3 py-3">
+                      <PostActions
+                        post={post}
+                        onChangePostStatus={onChangePostStatus}
+                        onDeletePost={onDeletePost}
+                        onShowInList={onShowInList}
+                        onHidePost={onHidePost}
+                      />
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </AdminTableFrame>
+      </div>
+
+      <PostListMobile
+        visiblePosts={visiblePosts}
+        selectedPostIds={selectedPostIds}
+        onTogglePost={onTogglePost}
+        onChangePostStatus={onChangePostStatus}
+        onDeletePost={onDeletePost}
+        onShowInList={onShowInList}
+        onHidePost={onHidePost}
+      />
     </AdminPanel>
   );
 }
@@ -423,4 +370,187 @@ function isPostPubliclyVisible(post: Post) {
   }
 
   return post.status === "scheduled" && Date.parse(post.publishedAt) <= Date.now();
+}
+
+type PostActionsProps = {
+  readonly post: Post;
+  readonly onChangePostStatus: (post: Post, status: ContentStatus) => void;
+  readonly onDeletePost: (post: Post) => void;
+  readonly onShowInList: (post: Post) => void;
+  readonly onHidePost?: (post: Post) => void;
+};
+
+// 桌面表格与移动端卡片共用的操作按钮，保证两套布局行为一致。
+function PostActions({
+  post,
+  onChangePostStatus,
+  onDeletePost,
+  onShowInList,
+  onHidePost,
+}: PostActionsProps) {
+  const isObsidianPost = post.externalSource?.kind === "obsidian_git";
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      <Button
+        render={<Link to="/admin/posts/$postId" params={{ postId: post.id }} />}
+        nativeButton={false}
+        size="sm"
+        variant="outline"
+      >
+        {m.admin_posts_edit()}
+      </Button>
+      {!isObsidianPost && !post.listed ? (
+        <>
+          {(["draft", "published", "archived"] as const).map((status) => (
+            <Button
+              key={status}
+              size="sm"
+              variant={post.status === status ? "default" : "outline"}
+              aria-pressed={post.status === status}
+              onClick={() => onChangePostStatus(post, status)}
+            >
+              {getPostStatusCopy(status).label}
+            </Button>
+          ))}
+          <Button size="sm" variant="outline" onClick={() => onShowInList(post)}>
+            <EyeIcon />
+            {m.admin_posts_show_in_list()}
+          </Button>
+        </>
+      ) : null}
+      {!isObsidianPost && post.listed ? (
+        <>
+          {post.status !== "published" ? (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => onChangePostStatus(post, "published")}
+            >
+              <SendIcon />
+              {m.admin_publish_post()}
+            </Button>
+          ) : null}
+          {post.status !== "draft" ? (
+            <Button size="sm" variant="outline" onClick={() => onChangePostStatus(post, "draft")}>
+              <FileTextIcon />
+              {m.admin_posts_move_to_draft()}
+            </Button>
+          ) : null}
+          {post.status !== "archived" ? (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => onChangePostStatus(post, "archived")}
+            >
+              <ArchiveIcon />
+              {m.admin_posts_archive()}
+            </Button>
+          ) : null}
+          {onHidePost ? (
+            <Button size="sm" variant="outline" onClick={() => onHidePost(post)}>
+              <EyeOffIcon />
+              {m.admin_posts_hide()}
+            </Button>
+          ) : null}
+        </>
+      ) : null}
+      {!isObsidianPost ? (
+        <Button size="sm" variant="destructive" onClick={() => onDeletePost(post)}>
+          {m.admin_posts_delete()}
+        </Button>
+      ) : null}
+    </div>
+  );
+}
+
+// 移动端（< lg）文章列表：用卡片代替宽表格，避免横向滚动、内容超出左右边线。
+function PostListMobile({
+  visiblePosts,
+  selectedPostIds,
+  onTogglePost,
+  onChangePostStatus,
+  onDeletePost,
+  onShowInList,
+  onHidePost,
+}: {
+  readonly visiblePosts: Post[];
+  readonly selectedPostIds: string[];
+  readonly onTogglePost: (postId: string, checked: boolean) => void;
+  readonly onChangePostStatus: (post: Post, status: ContentStatus) => void;
+  readonly onDeletePost: (post: Post) => void;
+  readonly onShowInList: (post: Post) => void;
+  readonly onHidePost?: (post: Post) => void;
+}) {
+  if (visiblePosts.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="mt-4 grid gap-3 lg:hidden">
+      {visiblePosts.map((post) => {
+        const statusCopy = getPostStatusCopy(post.status);
+        const isObsidianPost = post.externalSource?.kind === "obsidian_git";
+
+        return (
+          <div key={post.id} className="rounded-md border border-border/80 bg-card p-3 shadow-xs">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <Link
+                  to="/admin/posts/$postId"
+                  params={{ postId: post.id }}
+                  className="block font-medium hover:text-link"
+                >
+                  {post.title}
+                </Link>
+                {(post.pinned || post.featured || !post.listed) && (
+                  <div className="mt-1.5 flex flex-wrap gap-1.5">
+                    {post.pinned ? (
+                      <span className="rounded-sm border border-border bg-muted px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground">
+                        {m.pinned()}
+                      </span>
+                    ) : null}
+                    {post.featured ? (
+                      <span className="rounded-sm border border-border bg-muted px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground">
+                        {m.featured()}
+                      </span>
+                    ) : null}
+                    {!post.listed ? (
+                      <span className="rounded-sm border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-[11px] font-medium text-amber-600 dark:text-amber-400">
+                        {m.admin_posts_hidden_badge()}
+                      </span>
+                    ) : null}
+                  </div>
+                )}
+              </div>
+              <input
+                type="checkbox"
+                checked={selectedPostIds.includes(post.id)}
+                onChange={(event) => onTogglePost(post.id, event.currentTarget.checked)}
+                aria-label={m.admin_posts_select_one({ title: post.title })}
+                className="size-4 shrink-0 rounded border-input"
+              />
+            </div>
+            <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+              <span className="rounded-sm bg-accent px-2 py-1 font-medium text-accent-foreground">
+                {statusCopy.label}
+              </span>
+              <span>{post.series?.name ?? m.admin_posts_no_series()}</span>
+              <span>{isObsidianPost ? "Obsidian" : post.source}</span>
+              <span>{post.updatedAt.slice(0, 10)}</span>
+            </div>
+            <div className="mt-3">
+              <PostActions
+                post={post}
+                onChangePostStatus={onChangePostStatus}
+                onDeletePost={onDeletePost}
+                onShowInList={onShowInList}
+                onHidePost={onHidePost}
+              />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
 }

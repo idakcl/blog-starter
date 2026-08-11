@@ -1,9 +1,10 @@
 import { authQueryOptions } from "@repo/auth/tanstack/queries";
-import { getSiteSettingsForLocale } from "@repo/core";
+import { localizeSiteSettings } from "@repo/core";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 
 import { SiteShell } from "#/components/site-shell";
 import { redirectForRole, safeAccountRedirectPath } from "#/lib/account-routing";
+import { $getSiteSettings } from "#/lib/cms-server";
 import { getCurrentLocale } from "#/lib/i18n";
 import { getServerAuthUser } from "#/lib/route-auth";
 
@@ -18,6 +19,9 @@ export const Route = createFileRoute("/_guest")({
     // Redirect path when user is already present,
     // or after successful login/signup
     const REDIRECT_URL = safeAccountRedirectPath(search.redirectTo);
+    const locale = getCurrentLocale();
+    // 用数据库里的真实站点设置（含已配置的主题），而不是种子默认值。
+    const siteSettings = localizeSiteSettings(await $getSiteSettings(), locale);
     const serverUser = await getServerAuthUser();
 
     if (serverUser !== undefined) {
@@ -29,6 +33,7 @@ export const Route = createFileRoute("/_guest")({
 
       return {
         redirectUrl: REDIRECT_URL,
+        siteSettings,
       };
     }
 
@@ -44,12 +49,13 @@ export const Route = createFileRoute("/_guest")({
 
     return {
       redirectUrl: REDIRECT_URL,
+      siteSettings,
     };
   },
 });
 
 function RouteComponent() {
-  const siteSettings = getSiteSettingsForLocale(getCurrentLocale());
+  const { siteSettings } = Route.useRouteContext();
 
   return (
     <SiteShell siteSettings={siteSettings}>

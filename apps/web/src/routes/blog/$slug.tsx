@@ -215,20 +215,20 @@ function BlogPostPage() {
                     </Link>
                   ))}
                 </div>
-                <h1 className="mt-5 max-w-4xl text-4xl leading-tight font-semibold text-balance sm:text-5xl">
+                <h1 className="mt-5 max-w-4xl text-4xl leading-tight font-semibold text-balance break-words sm:text-5xl">
                   {localizedPost.title}
                 </h1>
-                <p className="mt-5 max-w-3xl text-base leading-7 text-muted-foreground sm:text-lg">
+                <p className="mt-5 max-w-3xl text-base leading-7 break-words text-muted-foreground sm:text-lg">
                   {localizedPost.excerpt}
                 </p>
-                <p className="mt-5 text-sm font-medium tracking-wide text-muted-foreground">
+                <p className="mt-5 text-sm font-medium tracking-wide break-words text-muted-foreground">
                   {formatDate(localizedPost.publishedAt, locale)} · {m.updated()}{" "}
                   {formatDate(localizedPost.updatedAt, locale)} · {localizedPost.authorName}
                 </p>
               </div>
 
               {coverImage ? (
-                <div className="overflow-hidden border border-border bg-muted">
+                <div className="min-w-0 overflow-hidden border border-border bg-muted">
                   <img
                     src={coverImage}
                     alt=""
@@ -311,7 +311,7 @@ function BlogPostPage() {
             ) : null}
 
             <div
-              className="prose prose-neutral prose-a:text-link prose-headings:scroll-mt-24 prose-headings:font-semibold dark:prose-invert max-w-none leading-8 [&>h1:first-child]:hidden"
+              className="prose prose-neutral prose-a:text-link prose-headings:scroll-mt-24 prose-headings:font-semibold dark:prose-invert max-w-none leading-8 [&_img]:max-w-full [&_pre]:overflow-x-auto [&_table]:block [&_table]:max-w-full [&_table]:overflow-x-auto [&>h1:first-child]:hidden"
               dangerouslySetInnerHTML={{ __html: articleBody.html }}
             />
 

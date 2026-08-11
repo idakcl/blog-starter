@@ -1,5 +1,4 @@
 import { authQueryOptions, type AuthQueryResult } from "@repo/auth/tanstack/queries";
-import { getSiteSettingsForLocale } from "@repo/core";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
@@ -21,9 +20,8 @@ export const Route = createFileRoute("/_guest/signup")({
 type AccountUser = NonNullable<AuthQueryResult>;
 
 function SignupForm() {
-  const { redirectUrl } = Route.useRouteContext();
+  const { redirectUrl, siteSettings } = Route.useRouteContext();
   const search = Route.useSearch();
-  const siteSettings = getSiteSettingsForLocale(getCurrentLocale());
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
