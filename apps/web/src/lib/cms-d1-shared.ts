@@ -315,10 +315,12 @@ export function normalizeSiteSettings(
     locales: ["en", "zh"],
     primaryLanguage,
     showDocsNav: input.showDocsNav ?? base.showDocsNav,
-    i18n: {
-      ...base.i18n,
-      ...input.i18n,
-    },
+    // 站点设置从 D1 读取时，base 是种子默认数据（demo-data.ts 含 i18n.description.zh
+    // 等示例翻译）。若直接把 base.i18n 合进来，已保存过的设置（input.i18n 为 {}）会被
+    // 种子的陈旧中文翻译覆盖，导致在 zh 语言下头部描述始终显示示例文案而非用户在后台
+    // 设置的值。仅当存储记录本身没有 i18n 字段（全新安装、从未保存过设置）时才回退到
+    // 种子翻译；一旦记录带有 i18n（含空对象 {}），就以它为准，不再继承种子翻译。
+    i18n: input.i18n !== undefined ? input.i18n : { ...base.i18n },
   };
 }
 
