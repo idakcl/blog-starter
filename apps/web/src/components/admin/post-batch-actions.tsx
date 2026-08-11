@@ -1,8 +1,9 @@
 import { Button } from "@repo/ui/components/button";
+import { EyeOffIcon } from "lucide-react";
 
 import { m } from "#/paraglide/messages.js";
 
-export type BatchAction = "publish" | "draft" | "archive" | "delete";
+export type BatchAction = "publish" | "draft" | "archive" | "delete" | "hide";
 
 interface PostBatchActionsProps {
   selectedCount: number;
@@ -41,6 +42,16 @@ export function PostBatchActions({ selectedCount, onAction }: PostBatchActionsPr
         onClick={() => onAction("archive")}
       >
         {m.admin_posts_archive()}
+      </Button>
+      <Button
+        type="button"
+        size="sm"
+        variant="outline"
+        disabled={!selectedCount}
+        onClick={() => onAction("hide")}
+      >
+        <EyeOffIcon />
+        {m.admin_posts_hide()}
       </Button>
       <Button
         type="button"

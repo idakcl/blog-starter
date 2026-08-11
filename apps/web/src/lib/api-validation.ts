@@ -134,7 +134,7 @@ export const BatchPostSchema = z
       .refine((ids) => new Set(ids).size === ids.length, {
         message: "Post ids must be unique.",
       }),
-    action: z.enum(["publish", "draft", "archive", "delete"]),
+    action: z.enum(["publish", "draft", "archive", "delete", "hide"]),
     locale: SupportedLocaleSchema.optional(),
   })
   .strict();

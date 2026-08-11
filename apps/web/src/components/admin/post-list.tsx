@@ -166,6 +166,25 @@ export function PostList({
             </span>
           ) : null}
         </Button>
+        {(["draft", "published", "archived"] as const).map((status) => {
+          const active = statusFilter === status && !hiddenFilter;
+
+          return (
+            <Button
+              key={status}
+              type="button"
+              size="sm"
+              variant={active ? "default" : "outline"}
+              aria-pressed={active}
+              onClick={() => {
+                onStatusFilterChange(active ? "all" : status);
+                onHiddenFilterChange(false);
+              }}
+            >
+              {getPostStatusCopy(status).label}
+            </Button>
+          );
+        })}
         {hiddenFilter ? (
           <span className="text-xs text-muted-foreground">
             仅显示已从公开列表隐藏的文章；点“显示在列表”可让其重新公开。

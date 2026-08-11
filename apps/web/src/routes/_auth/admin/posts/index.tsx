@@ -293,7 +293,9 @@ function getAdminPostsCopy(locale: "en" | "zh") {
             ? "批量改为草稿失败"
             : action === "archive"
               ? "批量归档失败"
-              : "批量删除失败",
+              : action === "hide"
+                ? "批量隐藏失败"
+                : "批量删除失败",
       batchSuccess: (action: BatchAction, count: number) =>
         action === "publish"
           ? `${count} 篇文章已发布`
@@ -301,7 +303,9 @@ function getAdminPostsCopy(locale: "en" | "zh") {
             ? `${count} 篇文章已改为草稿`
             : action === "archive"
               ? `${count} 篇文章已归档`
-              : `${count} 篇文章已删除`,
+              : action === "hide"
+                ? `${count} 篇文章已隐藏`
+                : `${count} 篇文章已删除`,
       deleteError: "文章删除失败",
       deleteSuccess: (title: string) => `“${title}”已删除`,
       networkError: "网络异常，请稍后再试。",
@@ -332,7 +336,9 @@ function getAdminPostsCopy(locale: "en" | "zh") {
           ? "Batch draft update failed"
           : action === "archive"
             ? "Batch archive failed"
-            : "Batch delete failed",
+            : action === "hide"
+              ? "Batch hide failed"
+              : "Batch delete failed",
     batchSuccess: (action: BatchAction, count: number) =>
       action === "publish"
         ? `${count} posts published`
@@ -340,7 +346,9 @@ function getAdminPostsCopy(locale: "en" | "zh") {
           ? `${count} posts moved to draft`
           : action === "archive"
             ? `${count} posts archived`
-            : `${count} posts deleted`,
+            : action === "hide"
+              ? `${count} posts hidden`
+              : `${count} posts deleted`,
     deleteError: "Post could not be deleted",
     deleteSuccess: (title: string) => `"${title}" deleted`,
     networkError: "Network error. Try again in a moment.",

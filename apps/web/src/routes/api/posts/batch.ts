@@ -38,7 +38,6 @@ export const Route = createFileRoute("/api/posts/batch")({
           }
         }
 
-        const status = batchStatusByAction[body.action];
         const locale = getApiLocale(request);
         const updatedPosts: Post[] = [];
 
@@ -53,7 +52,10 @@ export const Route = createFileRoute("/api/posts/batch")({
             continue;
           }
 
-          const updated = await updateD1Post(post.id, { status, locale });
+          const updated =
+            body.action === "hide"
+              ? await updateD1Post(post.id, { listed: false, locale })
+              : await updateD1Post(post.id, { status: batchStatusByAction[body.action], locale });
 
           if (updated) {
             updatedPosts.push(localizePost(updated, locale));
