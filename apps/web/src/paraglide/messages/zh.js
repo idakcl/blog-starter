@@ -118,6 +118,9 @@
 /** @typedef {{}} Admin_Posts_Select_AllInputs */
 /** @typedef {{ title: NonNullable<unknown> }} Admin_Posts_Select_OneInputs */
 /** @typedef {{ count: NonNullable<unknown> }} Admin_Posts_SelectedInputs */
+/** @typedef {{}} Admin_Posts_Deselect_AllInputs */
+/** @typedef {{}} Admin_Posts_PreviewInputs */
+/** @typedef {{ time: NonNullable<unknown> }} Admin_Posts_Scheduled_TimeInputs */
 /** @typedef {{}} Admin_Posts_SourceInputs */
 /** @typedef {{}} Admin_Posts_StatusInputs */
 /** @typedef {{}} Admin_Posts_Status_HelpInputs */
@@ -830,6 +833,18 @@ export const admin_posts_select_one = /** @type {(inputs: Admin_Posts_Select_One
 
 export const admin_posts_selected = /** @type {(inputs: Admin_Posts_SelectedInputs) => LocalizedString} */ (i) => {
 	return /** @type {LocalizedString} */ (`已选择 ${i?.count} 篇`)
+};
+
+export const admin_posts_deselect_all = /** @type {(inputs: Admin_Posts_Deselect_AllInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`取消全选`)
+};
+
+export const admin_posts_preview = /** @type {(inputs: Admin_Posts_PreviewInputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`预览`)
+};
+
+export const admin_posts_scheduled_time = /** @type {(inputs: Admin_Posts_Scheduled_TimeInputs) => LocalizedString} */ (i) => {
+	return /** @type {LocalizedString} */ (`定时发布：${i?.time}`)
 };
 
 export const admin_posts_source = /** @type {(inputs: Admin_Posts_SourceInputs) => LocalizedString} */ () => {

@@ -431,6 +431,10 @@ export function PostForm({
   const [assetRows, setAssetRows] = useState<Asset[]>([]);
   const [seriesRows, setSeriesRows] = useState<Series[]>([]);
   const [coverImage, setCoverImage] = useState(editingPost?.coverImage ?? "");
+  // 发布时间字段：改为受控，便于用「清除」按钮清空。清空后点「发布」会忽略此字段立即发布。
+  const [publishedAtValue, setPublishedAtValue] = useState(
+    toDatetimeLocal(editingPost?.publishedAt ?? fallbackPublishedAtIso),
+  );
   const [coverUploadState, setCoverUploadState] = useState<"idle" | "uploading" | "error">("idle");
   const [isCoverDragging, setIsCoverDragging] = useState(false);
   const mounted = useClientMounted();
@@ -1058,18 +1062,32 @@ export function PostForm({
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="editor-published-at">{m.admin_editor_publish_at()}</Label>
+            <div className="flex items-center justify-between gap-3">
+              <Label htmlFor="editor-published-at">{m.admin_editor_publish_at()}</Label>
+              {publishedAtValue ? (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setPublishedAtValue("")}
+                >
+                  <XIcon />
+                  {copy.clearTime}
+                </Button>
+              ) : null}
+            </div>
             <Input
               id="editor-published-at"
               name="publishedAt"
               type="datetime-local"
+              value={publishedAtValue}
+              onChange={(event) => setPublishedAtValue(event.currentTarget.value)}
               min={toDatetimeLocal(new Date().toISOString())}
-              defaultValue={toDatetimeLocal(editingPost?.publishedAt ?? fallbackPublishedAtIso)}
             />
             <p className="text-xs text-muted-foreground">
               {locale === "zh"
-                ? "点「定时发布」会按此处时间自动发布；不选时间将无法定时发布。"
-                : "Scheduled publishing uses this time. Pick a future time before clicking Schedule."}
+                ? "点「定时发布」会按此处时间自动发布，时间须晚于现在；想立即发布就清空时间，再点「发布」。"
+                : "Schedule uses this time (must be in the future). Clear it to publish immediately."}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-x-5 gap-y-3 lg:col-span-2">
@@ -1339,6 +1357,7 @@ function getPostFormCopy(locale: "en" | "zh") {
     return {
       cancel: "取消",
       clearCover: "清空封面",
+      clearTime: "清除时间",
       close: "关闭",
       coverInvalid: "请选择图片文件。",
       coverUploaded: "封面已上传",
@@ -1374,8 +1393,9 @@ function getPostFormCopy(locale: "en" | "zh") {
   }
 
   return {
-    cancel: "Cancel",
-    clearCover: "Clear cover",
+      cancel: "Cancel",
+      clearCover: "Clear cover",
+      clearTime: "Clear time",
     close: "Close",
     coverInvalid: "Choose an image file.",
     coverUploaded: "Cover uploaded",

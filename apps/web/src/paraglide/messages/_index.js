@@ -120,6 +120,9 @@ import { getLocale, experimentalStaticLocale } from "../runtime.js"
 /** @typedef {{}} Admin_Posts_Select_AllInputs */
 /** @typedef {{ title: NonNullable<unknown> }} Admin_Posts_Select_OneInputs */
 /** @typedef {{ count: NonNullable<unknown> }} Admin_Posts_SelectedInputs */
+/** @typedef {{}} Admin_Posts_Deselect_AllInputs */
+/** @typedef {{}} Admin_Posts_PreviewInputs */
+/** @typedef {{ time: NonNullable<unknown> }} Admin_Posts_Scheduled_TimeInputs */
 /** @typedef {{}} Admin_Posts_SourceInputs */
 /** @typedef {{}} Admin_Posts_StatusInputs */
 /** @typedef {{}} Admin_Posts_Status_HelpInputs */
@@ -2013,6 +2016,48 @@ export const admin_posts_selected = /** @type {((inputs: Admin_Posts_SelectedInp
 	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
 	if (locale === "en") return __en.admin_posts_selected(inputs)
 	return __zh.admin_posts_selected(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Deselect all" |
+*
+* @param {Admin_Posts_Deselect_AllInputs} inputs
+* @param {{ locale?: "en" | "zh" }} options
+* @returns {LocalizedString}
+*/
+export const admin_posts_deselect_all = /** @type {((inputs?: Admin_Posts_Deselect_AllInputs, options?: { locale?: "en" | "zh" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Admin_Posts_Deselect_AllInputs, { locale?: "en" | "zh" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.admin_posts_deselect_all(inputs)
+	return __zh.admin_posts_deselect_all(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Preview" |
+*
+* @param {Admin_Posts_PreviewInputs} inputs
+* @param {{ locale?: "en" | "zh" }} options
+* @returns {LocalizedString}
+*/
+export const admin_posts_preview = /** @type {((inputs?: Admin_Posts_PreviewInputs, options?: { locale?: "en" | "zh" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Admin_Posts_PreviewInputs, { locale?: "en" | "zh" }, {}>} */ ((inputs = {}, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.admin_posts_preview(inputs)
+	return __zh.admin_posts_preview(inputs)
+});
+/**
+* | output |
+* | --- |
+* | "Scheduled: {time}" |
+*
+* @param {Admin_Posts_Scheduled_TimeInputs} inputs
+* @param {{ locale?: "en" | "zh" }} options
+* @returns {LocalizedString}
+*/
+export const admin_posts_scheduled_time = /** @type {((inputs: Admin_Posts_Scheduled_TimeInputs, options?: { locale?: "en" | "zh" }) => LocalizedString) & import('../runtime.js').MessageMetadata<Admin_Posts_Scheduled_TimeInputs, { locale?: "en" | "zh" }, {}>} */ ((inputs, options = {}) => {
+	const locale = experimentalStaticLocale ?? options.locale ?? getLocale()
+	if (locale === "en") return __en.admin_posts_scheduled_time(inputs)
+	return __zh.admin_posts_scheduled_time(inputs)
 });
 /**
 * | output |

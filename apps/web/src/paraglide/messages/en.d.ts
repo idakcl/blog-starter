@@ -117,6 +117,9 @@
 /** @typedef {{}} Admin_Posts_Select_AllInputs */
 /** @typedef {{ title: NonNullable<unknown> }} Admin_Posts_Select_OneInputs */
 /** @typedef {{ count: NonNullable<unknown> }} Admin_Posts_SelectedInputs */
+/** @typedef {{}} Admin_Posts_Deselect_AllInputs */
+/** @typedef {{}} Admin_Posts_PreviewInputs */
+/** @typedef {{ time: NonNullable<unknown> }} Admin_Posts_Scheduled_TimeInputs */
 /** @typedef {{}} Admin_Posts_SourceInputs */
 /** @typedef {{}} Admin_Posts_StatusInputs */
 /** @typedef {{}} Admin_Posts_Status_HelpInputs */
@@ -475,6 +478,9 @@ export const admin_posts_search: (inputs: Admin_Posts_SearchInputs) => Localized
 export const admin_posts_select_all: (inputs: Admin_Posts_Select_AllInputs) => LocalizedString;
 export const admin_posts_select_one: (inputs: Admin_Posts_Select_OneInputs) => LocalizedString;
 export const admin_posts_selected: (inputs: Admin_Posts_SelectedInputs) => LocalizedString;
+export const admin_posts_deselect_all: (inputs: Admin_Posts_Deselect_AllInputs) => LocalizedString;
+export const admin_posts_preview: (inputs: Admin_Posts_PreviewInputs) => LocalizedString;
+export const admin_posts_scheduled_time: (inputs: Admin_Posts_Scheduled_TimeInputs) => LocalizedString;
 export const admin_posts_source: (inputs: Admin_Posts_SourceInputs) => LocalizedString;
 export const admin_posts_status: (inputs: Admin_Posts_StatusInputs) => LocalizedString;
 export const admin_posts_status_help: (inputs: Admin_Posts_Status_HelpInputs) => LocalizedString;
@@ -847,6 +853,11 @@ export type Admin_Posts_Select_OneInputs = {
 };
 export type Admin_Posts_SelectedInputs = {
     count: NonNullable<unknown>;
+};
+export type Admin_Posts_Deselect_AllInputs = {};
+export type Admin_Posts_PreviewInputs = {};
+export type Admin_Posts_Scheduled_TimeInputs = {
+    time: NonNullable<unknown>;
 };
 export type Admin_Posts_SourceInputs = {};
 export type Admin_Posts_StatusInputs = {};
