@@ -166,7 +166,7 @@ export function PostList({
             </span>
           ) : null}
         </Button>
-        {(["draft", "published", "archived"] as const).map((status) => {
+        {(["draft", "published", "scheduled", "archived"] as const).map((status) => {
           const active = statusFilter === status && !hiddenFilter;
 
           return (
@@ -275,12 +275,17 @@ export function PostList({
                       </div>
                     </td>
                     <td className="px-3 py-3">
-                      <span
-                        className="rounded-sm bg-accent px-2 py-1 text-xs font-medium text-accent-foreground"
-                        title={statusCopy.description}
-                      >
-                        {statusCopy.label}
-                      </span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {getPostStatusBadges(post).map((badge) => (
+                          <span
+                            key={badge.label}
+                            className="rounded-sm bg-accent px-2 py-1 text-xs font-medium text-accent-foreground"
+                            title={statusCopy.description}
+                          >
+                            {badge.label}
+                          </span>
+                        ))}
+                      </div>
                     </td>
                     <td className="px-3 py-3 text-muted-foreground">
                       {post.series?.name ?? m.admin_posts_no_series()}
@@ -370,6 +375,18 @@ function isPostPubliclyVisible(post: Post) {
   }
 
   return post.status === "scheduled" && Date.parse(post.publishedAt) <= Date.now();
+}
+
+// 状态徽章：定时发布且发布时间已过，除「定时发布」外再追加「已发布」徽章。
+function getPostStatusBadges(post: Post): Array<{ label: string }> {
+  if (post.status === "scheduled" && Date.parse(post.publishedAt) <= Date.now()) {
+    return [
+      { label: getPostStatusCopy("scheduled").label },
+      { label: getPostStatusCopy("published").label },
+    ];
+  }
+
+  return [{ label: getPostStatusCopy(post.status).label }];
 }
 
 type PostActionsProps = {
@@ -489,7 +506,6 @@ function PostListMobile({
   return (
     <div className="mt-4 grid gap-3 lg:hidden">
       {visiblePosts.map((post) => {
-        const statusCopy = getPostStatusCopy(post.status);
         const isObsidianPost = post.externalSource?.kind === "obsidian_git";
 
         return (
@@ -532,9 +548,14 @@ function PostListMobile({
               />
             </div>
             <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-              <span className="rounded-sm bg-accent px-2 py-1 font-medium text-accent-foreground">
-                {statusCopy.label}
-              </span>
+              {getPostStatusBadges(post).map((badge) => (
+                <span
+                  key={badge.label}
+                  className="rounded-sm bg-accent px-2 py-1 font-medium text-accent-foreground"
+                >
+                  {badge.label}
+                </span>
+              ))}
               <span>{post.series?.name ?? m.admin_posts_no_series()}</span>
               <span>{isObsidianPost ? "Obsidian" : post.source}</span>
               <span>{post.updatedAt.slice(0, 10)}</span>
