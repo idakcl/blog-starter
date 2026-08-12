@@ -148,8 +148,9 @@ function BlogPostPage() {
   const editLabel = locale === "zh" ? "编辑文章" : m.admin_posts_edit();
 
   // 文章里的视频：未播放时用「第一帧画面」作为背景覆盖层盖在视频上面。
-  // 已带 #poster= 的视频直接复用该首帧；其余用独立 crossOrigin 探针视频截第一帧。
-  // 对未配置 CORS 的源，探针失败会被忽略，视频仍按原生 preload=metadata 显示首帧。
+  // 视频默认 opacity:0（容器 CSS），等首帧就绪/自身加载完成再显示，避免未加载时
+  // 闪现浏览器默认的占位框（如 16:9）。已带 #poster= 的视频直接复用该首帧；
+  // 其余用独立 crossOrigin 探针视频在 loadeddata（即首帧）直接截帧。
   useEffect(() => {
     const root = articleRef.current;
     if (!root) return;
@@ -174,13 +175,24 @@ function BlogPostPage() {
         "position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;transition:opacity .2s ease;";
       wrapper.appendChild(overlay);
 
+      let revealed = false;
+      const reveal = () => {
+        if (revealed) return;
+        revealed = true;
+        video.style.opacity = "1"; // 显示视频（首帧由 overlay 或原生覆盖）
+      };
+
       const hideOverlay = () => {
         overlay.style.opacity = "0";
       };
       const showOverlay = () => {
         overlay.style.opacity = "1";
       };
-      video.addEventListener("play", hideOverlay);
+      // 播放时隐藏覆盖层露出视频；暂停/结束再盖回第一帧。
+      video.addEventListener("play", () => {
+        reveal();
+        hideOverlay();
+      });
       video.addEventListener("pause", showOverlay);
       video.addEventListener("ended", showOverlay);
 
@@ -188,6 +200,7 @@ function BlogPostPage() {
         if (!src) return;
         overlay.src = src;
         video.poster = src; // 同时写回原生 poster，给视频元素提供尺寸
+        reveal();
       };
 
       if (video.poster) {
@@ -195,8 +208,9 @@ function BlogPostPage() {
         return;
       }
 
+      // 探针：用 crossOrigin 读取首帧像素；loadeddata 时当前帧即为首帧，直接截。
       const probe = document.createElement("video");
-      probe.crossOrigin = "anonymous"; // 仅在探针上开启，便于跨域读取首帧像素
+      probe.crossOrigin = "anonymous";
       probe.muted = true;
       probe.preload = "metadata";
       probe.style.cssText =
@@ -215,27 +229,40 @@ function BlogPostPage() {
           if (ctx && probe.videoWidth) {
             ctx.drawImage(probe, 0, 0, canvas.width, canvas.height);
             applyFrame(canvas.toDataURL("image/jpeg", 0.85));
+          } else {
+            reveal(); // 无首帧尺寸，直接显示视频（原生首帧）
           }
         } catch {
           // 跨域且源未配置 CORS 时画布会被污染，截图失败属正常，忽略即可
         }
         cleanup();
       };
-      probe.addEventListener("seeked", captureFromProbe, { once: true });
+      probe.addEventListener("loadeddata", captureFromProbe, { once: true });
       probe.addEventListener(
-        "loadeddata",
+        "error",
         () => {
-          try {
-            probe.currentTime = 0.1; // 跳到首帧再截
-          } catch {
-            captureFromProbe();
-          }
+          cleanup();
+          reveal(); // 探针失败，回退原生视频首帧
         },
         { once: true },
       );
-      probe.addEventListener("error", cleanup, { once: true });
+      // 部分浏览器/已缓存资源在 addEventListener 前就已 loadeddata，直接尝试截帧。
+      if (probe.readyState >= 2) captureFromProbe();
       // 部分浏览器不会为未挂载的 video 触发解码事件，挂到屏外再截帧
       document.body.appendChild(probe);
+
+      // 兜底：可见视频自身元数据加载完成后，无论探针是否成功都显示（原生首帧）。
+      video.addEventListener(
+        "loadeddata",
+        () => {
+          if (!overlay.src) reveal();
+        },
+        { once: true },
+      );
+      // 安全网：若数秒内仍无首帧（如网络挂起），直接显示视频，避免永久隐藏。
+      window.setTimeout(() => {
+        if (!revealed) reveal();
+      }, 4000);
     });
   }, [articleBody.html]);
   const coverImage = resolvePostCoverImage(localizedPost.coverImage);
@@ -405,7 +432,7 @@ function BlogPostPage() {
 
             <div
               ref={articleRef}
-              className="prose prose-neutral prose-a:text-link prose-headings:scroll-mt-24 prose-headings:font-semibold dark:prose-invert max-w-none leading-8 [&_img]:max-w-full [&_pre]:overflow-x-auto [&_table]:block [&_table]:max-w-full [&_table]:overflow-x-auto [&_video]:h-auto [&_video]:w-full [&_video]:rounded-xl [&_video]:bg-black/5 [&>h1:first-child]:hidden"
+              className="prose prose-neutral prose-a:text-link prose-headings:scroll-mt-24 prose-headings:font-semibold dark:prose-invert max-w-none leading-8 [&_img]:max-w-full [&_pre]:overflow-x-auto [&_table]:block [&_table]:max-w-full [&_table]:overflow-x-auto [&_video]:h-auto [&_video]:w-full [&_video]:rounded-xl [&_video]:bg-black/5 [&_video]:opacity-0 [&>h1:first-child]:hidden"
               dangerouslySetInnerHTML={{ __html: articleBody.html }}
             />
 
