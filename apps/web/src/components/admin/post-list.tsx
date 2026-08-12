@@ -154,6 +154,15 @@ export function PostList({
         <Button
           type="button"
           size="sm"
+          variant={allVisibleSelected ? "default" : "outline"}
+          aria-pressed={allVisibleSelected}
+          onClick={() => onToggleAll(!allVisibleSelected)}
+        >
+          {allVisibleSelected ? m.admin_posts_deselect_all() : m.admin_posts_select_all()}
+        </Button>
+        <Button
+          type="button"
+          size="sm"
           variant={hiddenFilter ? "default" : "outline"}
           onClick={() => onHiddenFilterChange(!hiddenFilter)}
           aria-pressed={hiddenFilter}
@@ -225,6 +234,7 @@ export function PostList({
                   />
                 </th>
                 <th className="px-3 py-2.5">{m.admin_posts_column_title()}</th>
+                <th className="px-3 py-2.5">{m.admin_posts_preview()}</th>
                 <th className="px-3 py-2.5">{m.admin_posts_status()}</th>
                 <th className="px-3 py-2.5">{m.admin_series_title()}</th>
                 <th className="px-3 py-2.5">{m.admin_posts_source()}</th>
@@ -238,6 +248,8 @@ export function PostList({
                 const statusCopy = getPostStatusCopy(post.status);
                 const publiclyVisible = isPostPubliclyVisible(post);
                 const isObsidianPost = post.externalSource?.kind === "obsidian_git";
+                const thumbnail = getPostThumbnail(post);
+                const previewText = getPostPreviewText(post);
 
                 return (
                   <tr key={post.id}>
@@ -275,6 +287,26 @@ export function PostList({
                       </div>
                     </td>
                     <td className="px-3 py-3">
+                      <div className="flex items-start gap-3">
+                        {thumbnail ? (
+                          <img
+                            src={thumbnail}
+                            alt=""
+                            loading="lazy"
+                            className="size-14 shrink-0 rounded-md border border-border object-cover"
+                          />
+                        ) : null}
+                        <div className="grid min-w-0 gap-1">
+                          {post.excerpt ? (
+                            <p className="line-clamp-2 text-sm text-muted-foreground">
+                              {post.excerpt}
+                            </p>
+                          ) : null}
+                          <p className="truncate text-xs text-foreground/80">{previewText}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3">
                       <div className="flex flex-wrap gap-1.5">
                         {getPostStatusBadges(post).map((badge) => (
                           <span
@@ -286,6 +318,13 @@ export function PostList({
                           </span>
                         ))}
                       </div>
+                      {post.status === "scheduled" ? (
+                        <p className="mt-1 text-[11px] text-muted-foreground">
+                          {m.admin_posts_scheduled_time({
+                            time: formatScheduledTime(post.publishedAt),
+                          })}
+                        </p>
+                      ) : null}
                     </td>
                     <td className="px-3 py-3 text-muted-foreground">
                       {post.series?.name ?? m.admin_posts_no_series()}
@@ -387,6 +426,24 @@ function getPostStatusBadges(post: Post): Array<{ label: string }> {
   }
 
   return [{ label: getPostStatusCopy(post.status).label }];
+}
+
+// 文章缩略图：优先用封面图，其次取正文里的第一张图片。
+function getPostThumbnail(post: Post): string | undefined {
+  if (post.coverImage) return post.coverImage;
+  const match = /<img[^>]+src=["']([^"']+)["']/i.exec(post.contentHtml ?? "");
+  return match?.[1];
+}
+
+// 文章预览文字：取正文纯文本前 20 个字（超出补省略号）。
+function getPostPreviewText(post: Post): string {
+  const text = (post.contentText ?? "").replace(/\s+/g, " ").trim();
+  return text.length > 20 ? `${text.slice(0, 20)}…` : text;
+}
+
+// 定时发布时间（ISO 转 YYYY-MM-DD HH:mm，本地可读）。
+function formatScheduledTime(iso: string): string {
+  return iso.slice(0, 16).replace("T", " ");
 }
 
 type PostActionsProps = {
@@ -547,6 +604,22 @@ function PostListMobile({
                 className="size-4 shrink-0 rounded border-input"
               />
             </div>
+            <div className="mt-3 flex items-start gap-3">
+              {getPostThumbnail(post) ? (
+                <img
+                  src={getPostThumbnail(post)}
+                  alt=""
+                  loading="lazy"
+                  className="size-16 shrink-0 rounded-md border border-border object-cover"
+                />
+              ) : null}
+              <div className="grid min-w-0 gap-1">
+                {post.excerpt ? (
+                  <p className="line-clamp-2 text-sm text-muted-foreground">{post.excerpt}</p>
+                ) : null}
+                <p className="text-xs text-foreground/80">{getPostPreviewText(post)}</p>
+              </div>
+            </div>
             <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
               {getPostStatusBadges(post).map((badge) => (
                 <span
@@ -556,6 +629,11 @@ function PostListMobile({
                   {badge.label}
                 </span>
               ))}
+              {post.status === "scheduled" ? (
+                <span className="text-amber-600 dark:text-amber-400">
+                  {m.admin_posts_scheduled_time({ time: formatScheduledTime(post.publishedAt) })}
+                </span>
+              ) : null}
               <span>{post.series?.name ?? m.admin_posts_no_series()}</span>
               <span>{isObsidianPost ? "Obsidian" : post.source}</span>
               <span>{post.updatedAt.slice(0, 10)}</span>
