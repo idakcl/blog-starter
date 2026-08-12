@@ -147,9 +147,9 @@ function BlogPostPage() {
   const articleBody = buildArticleBody(localizedPost.contentHtml);
   const editLabel = locale === "zh" ? "编辑文章" : m.admin_posts_edit();
 
-  // 文章里的视频：第一帧直接走浏览器原生 poster / 首帧（preload=metadata），不依赖
-  // 前端截帧（跨域 .mov 等会因画布污染而失败）。视频默认 opacity:0（容器 CSS），等
-  // 元数据/首帧就绪再显示，避免未加载时闪现浏览器默认的占位框（如 16:9）。
+  // 文章里的视频：第一帧直接走浏览器原生 poster / 首帧，不依赖前端截帧（跨域 .mov
+  // 等会因画布污染而失败）。视频默认 opacity:0（容器 CSS），等元数据就绪再显示，
+  // 避免未加载时闪现浏览器默认的占位框（如 16:9）。
   useEffect(() => {
     const root = articleRef.current;
     if (!root) return;
@@ -163,16 +163,23 @@ function BlogPostPage() {
       const reveal = () => {
         if (revealed) return;
         revealed = true;
-        video.style.opacity = "1"; // 显示视频（首帧由原生 poster/首帧提供）
+        video.style.opacity = "1"; // 显示视频（首帧由原生 poster / 首帧提供）
       };
 
-      // 已带 #poster= 的视频，poster 会立即撑出尺寸并显示首帧，可直接显示；
-      // 无 poster 的视频，等元数据加载出原生首帧（loadeddata）再显示。
+      // 已带 #poster= 的视频，poster 会立即撑出尺寸并显示首帧，可直接显示。
       if (video.poster) {
         reveal();
         return;
       }
-      video.addEventListener("loadeddata", reveal, { once: true });
+      // 无 poster 的视频：元数据就绪（loadedmetadata）即可正确显示尺寸与首帧，
+      // 不再等 loadeddata（preload=metadata 下不会触发），避免一直隐藏“看不到”。
+      // 同时监听 loadeddata 兜底；缓存命中时 readyState 已 >=1，直接显示。
+      if (video.readyState >= 1) {
+        reveal();
+      } else {
+        video.addEventListener("loadedmetadata", reveal, { once: true });
+        video.addEventListener("loadeddata", reveal, { once: true });
+      }
       // 安全网：异常情况下避免视频永久隐藏。
       window.setTimeout(() => {
         if (!revealed) reveal();

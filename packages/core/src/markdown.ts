@@ -152,8 +152,11 @@ function inlineMarkdown(value: string) {
 
       if (isVideo) {
         const posterAttr = poster ? ` poster="${poster}"` : "";
-        // playsinline + webkit-playsinline 让视频在微信/iOS 里页内播放，不跳系统播放器
-        return `<video src="${url}"${posterAttr} controls preload="metadata" playsinline webkit-playsinline></video>`;
+        // playsinline + webkit-playsinline 让视频在微信/iOS 里页内播放，不跳系统播放器。
+        // 无 poster 的视频用 preload="auto"：否则只预加载元数据，首帧要等播放才出现，
+        // 页面上会一直空白（看起来“看不到”，点击才出画面）。有 poster 的用 metadata 省流量。
+        const preload = poster ? "metadata" : "auto";
+        return `<video src="${url}"${posterAttr} controls preload="${preload}" playsinline webkit-playsinline></video>`;
       }
 
       return `<img src="${url}" alt="${alt}" />`;
