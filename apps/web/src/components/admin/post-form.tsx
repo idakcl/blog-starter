@@ -910,7 +910,8 @@ export function PostForm({
               id="editor-title"
               name="title"
               required
-              defaultValue={editingPost?.title ?? m.admin_editor_default_title()}
+              defaultValue={editingPost?.title ?? ""}
+              placeholder={copy.titlePlaceholder}
               className="h-12 text-lg font-semibold md:text-lg"
             />
           </div>
@@ -919,7 +920,8 @@ export function PostForm({
             <Input
               id="editor-excerpt"
               name="excerpt"
-              defaultValue={editingPost?.excerpt ?? m.admin_editor_default_excerpt()}
+              defaultValue={editingPost?.excerpt ?? ""}
+              placeholder={copy.excerptPlaceholder}
             />
           </div>
           <div className="grid gap-2">
@@ -1352,6 +1354,8 @@ function getPostFormCopy(locale: "en" | "zh") {
       retryAll: "失败的全部重新上传",
       richEditorUnavailable: "富文本编辑器无法打开这段 Markdown，可以先在源码模式继续编辑。",
       saving: "正在保存...",
+      titlePlaceholder: "请输入标题",
+      excerptPlaceholder: "请输入摘要",
       slugHint: "留空则自动生成 16 位随机链接（文章名是汉字，不塞进 URL）。",
       slugLabel: "别名 / 链接",
       slugPlaceholder: "留空自动生成 16 位随机链接",
@@ -1389,6 +1393,8 @@ function getPostFormCopy(locale: "en" | "zh") {
     richEditorUnavailable:
       "The rich editor could not open this Markdown. Continue editing in source.",
     saving: "Saving...",
+    titlePlaceholder: "Enter a title",
+    excerptPlaceholder: "Enter a short excerpt",
     slugHint:
       "Leave empty to auto-generate a 16-character random slug (Chinese titles are not used in the URL).",
     slugLabel: "Alias / slug",

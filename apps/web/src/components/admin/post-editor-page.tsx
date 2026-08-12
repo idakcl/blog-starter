@@ -13,7 +13,7 @@ import { m } from "#/paraglide/messages.js";
 
 type FormSubmitHandler = NonNullable<ComponentProps<"form">["onSubmit"]>;
 
-const defaultMarkdown = "# New post\n\nStart writing in Markdown.";
+const defaultMarkdown = "";
 const aiSettingsEndpoint = "/api/admin/ai-settings";
 const aiPublishNoticeStorageKey = "blogcms:ai-publish-automation-notice-dismissed";
 
