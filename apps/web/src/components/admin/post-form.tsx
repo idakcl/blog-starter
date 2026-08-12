@@ -1063,8 +1063,14 @@ export function PostForm({
               id="editor-published-at"
               name="publishedAt"
               type="datetime-local"
+              min={toDatetimeLocal(new Date().toISOString())}
               defaultValue={toDatetimeLocal(editingPost?.publishedAt ?? fallbackPublishedAtIso)}
             />
+            <p className="text-xs text-muted-foreground">
+              {locale === "zh"
+                ? "点「定时发布」会按此处时间自动发布；不选时间将无法定时发布。"
+                : "Scheduled publishing uses this time. Pick a future time before clicking Schedule."}
+            </p>
           </div>
           <div className="flex flex-wrap items-center gap-x-5 gap-y-3 lg:col-span-2">
             <label className="flex min-h-9 items-center gap-2 text-sm">

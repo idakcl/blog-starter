@@ -147,31 +147,53 @@ function BlogPostPage() {
   const articleBody = buildArticleBody(localizedPost.contentHtml);
   const editLabel = locale === "zh" ? "编辑文章" : m.admin_posts_edit();
 
-  // 文章里的视频：若没有 poster（外部视频 / 旧文章 / 首帧捕获失败），截取第一帧作为背景海报。
-  // 用独立的 crossOrigin 探针视频去读像素，避免污染可见视频的画布；对不支持 CORS 的源，
-  // 探针加载失败会被忽略，可见视频仍按原生 preload=metadata 显示首帧，不影响播放。
+  // 文章里的视频：未播放时用「第一帧画面」作为背景覆盖层盖在视频上面。
+  // 已带 #poster= 的视频直接复用该首帧；其余用独立 crossOrigin 探针视频截第一帧。
+  // 对未配置 CORS 的源，探针失败会被忽略，视频仍按原生 preload=metadata 显示首帧。
   useEffect(() => {
     const root = articleRef.current;
     if (!root) return;
     const videos = Array.from(root.querySelectorAll("video")) as HTMLVideoElement[];
 
     videos.forEach((video) => {
-      if (video.poster) return; // 已有首帧海报（来自 #poster=），无需兜底
+      if (video.dataset.firstFrameHandled) return; // 避免同一节点重复处理
+      video.dataset.firstFrameHandled = "1";
 
-      const captureFrom = (source: HTMLVideoElement) => {
-        try {
-          const canvas = document.createElement("canvas");
-          canvas.width = source.videoWidth || 480;
-          canvas.height = source.videoHeight || 270;
-          const ctx = canvas.getContext("2d");
-          if (ctx && source.videoWidth) {
-            ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
-            video.poster = canvas.toDataURL("image/jpeg", 0.85);
-          }
-        } catch {
-          // 跨域且源未配置 CORS 时画布会被污染，截图失败属正常，忽略即可
-        }
+      // 用相对定位容器包裹视频，覆盖层绝对定位铺满，保证按原视频比例显示。
+      const wrapper = document.createElement("div");
+      wrapper.style.position = "relative";
+      wrapper.style.width = "100%";
+      if (video.parentNode) {
+        video.parentNode.insertBefore(wrapper, video);
+        wrapper.appendChild(video);
+      }
+
+      const overlay = document.createElement("img");
+      overlay.setAttribute("aria-hidden", "true");
+      overlay.style.cssText =
+        "position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;transition:opacity .2s ease;";
+      wrapper.appendChild(overlay);
+
+      const hideOverlay = () => {
+        overlay.style.opacity = "0";
       };
+      const showOverlay = () => {
+        overlay.style.opacity = "1";
+      };
+      video.addEventListener("play", hideOverlay);
+      video.addEventListener("pause", showOverlay);
+      video.addEventListener("ended", showOverlay);
+
+      const applyFrame = (src: string) => {
+        if (!src) return;
+        overlay.src = src;
+        video.poster = src; // 同时写回原生 poster，给视频元素提供尺寸
+      };
+
+      if (video.poster) {
+        applyFrame(video.poster); // 已有 #poster= 首帧，直接复用
+        return;
+      }
 
       const probe = document.createElement("video");
       probe.crossOrigin = "anonymous"; // 仅在探针上开启，便于跨域读取首帧像素
@@ -184,19 +206,29 @@ function BlogPostPage() {
       const cleanup = () => {
         if (probe.parentNode) probe.parentNode.removeChild(probe);
       };
-      const onSeeked = () => {
-        captureFrom(probe);
+      const captureFromProbe = () => {
+        try {
+          const canvas = document.createElement("canvas");
+          canvas.width = probe.videoWidth || 480;
+          canvas.height = probe.videoHeight || 270;
+          const ctx = canvas.getContext("2d");
+          if (ctx && probe.videoWidth) {
+            ctx.drawImage(probe, 0, 0, canvas.width, canvas.height);
+            applyFrame(canvas.toDataURL("image/jpeg", 0.85));
+          }
+        } catch {
+          // 跨域且源未配置 CORS 时画布会被污染，截图失败属正常，忽略即可
+        }
         cleanup();
       };
-      probe.addEventListener("seeked", onSeeked, { once: true });
+      probe.addEventListener("seeked", captureFromProbe, { once: true });
       probe.addEventListener(
         "loadeddata",
         () => {
           try {
             probe.currentTime = 0.1; // 跳到首帧再截
           } catch {
-            captureFrom(probe);
-            cleanup();
+            captureFromProbe();
           }
         },
         { once: true },
@@ -373,7 +405,7 @@ function BlogPostPage() {
 
             <div
               ref={articleRef}
-              className="prose prose-neutral prose-a:text-link prose-headings:scroll-mt-24 prose-headings:font-semibold dark:prose-invert max-w-none leading-8 [&_img]:max-w-full [&_pre]:overflow-x-auto [&_table]:block [&_table]:max-w-full [&_table]:overflow-x-auto [&_video]:aspect-video [&_video]:w-full [&_video]:rounded-xl [&_video]:bg-black/5 [&_video]:object-cover [&>h1:first-child]:hidden"
+              className="prose prose-neutral prose-a:text-link prose-headings:scroll-mt-24 prose-headings:font-semibold dark:prose-invert max-w-none leading-8 [&_img]:max-w-full [&_pre]:overflow-x-auto [&_table]:block [&_table]:max-w-full [&_table]:overflow-x-auto [&_video]:h-auto [&_video]:w-full [&_video]:rounded-xl [&_video]:bg-black/5 [&>h1:first-child]:hidden"
               dangerouslySetInnerHTML={{ __html: articleBody.html }}
             />
 

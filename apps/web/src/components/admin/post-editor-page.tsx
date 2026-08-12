@@ -37,9 +37,7 @@ export function PostEditorPage({ postId }: PostEditorPageProps) {
   const [aiAutomationConfigured, setAiAutomationConfigured] = useState(false);
   const [showAiPublishNotice, setShowAiPublishNotice] = useState(false);
   const [dismissAiPublishNotice, setDismissAiPublishNotice] = useState(false);
-  const [fallbackPublishedAtIso] = useState(() =>
-    new Date(Date.now() + 60 * 60 * 1000).toISOString(),
-  );
+  const [fallbackPublishedAtIso] = useState("");
 
   useEffect(() => {
     if (!postId) {
@@ -127,6 +125,29 @@ export function PostEditorPage({ postId }: PostEditorPageProps) {
       : `/api/posts?lang=${locale}`;
     const tagsValue = formData.get("tags");
     const publishedAtValue = formData.get("publishedAt");
+
+    // 定时发布：必须先选择「发布时间」且该时间晚于当前，否则拦截并提示。
+    if (status === "scheduled") {
+      const raw = typeof publishedAtValue === "string" ? publishedAtValue.trim() : "";
+      if (!raw) {
+        setEditorState("idle");
+        toast.error(
+          locale === "zh"
+            ? "请先在右侧『发布时间』选择定时发布的时间"
+            : "Pick a time in 'Publish time' first",
+        );
+        return;
+      }
+      const iso = datetimeLocalToIso(raw);
+      if (iso && new Date(iso).getTime() <= Date.now()) {
+        setEditorState("idle");
+        toast.error(
+          locale === "zh" ? "定时发布时间必须晚于当前时间" : "Scheduled time must be in the future",
+        );
+        return;
+      }
+    }
+
     const publishedAt =
       status === "published"
         ? new Date().toISOString()
