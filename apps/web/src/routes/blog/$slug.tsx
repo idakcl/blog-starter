@@ -150,12 +150,14 @@ function BlogPostPage() {
   // 文章里的视频：第一帧直接走浏览器原生 poster / 首帧，不依赖前端截帧（跨域 .mov
   // 等会因画布污染而失败）。视频默认 opacity:0（容器 CSS），等元数据就绪再显示，
   // 避免未加载时闪现浏览器默认的占位框（如 16:9）。
+  // 注意：SSR 与客户端 hydration 不匹配（React error #418）时，React 会丢弃并重建
+  // 子树，视频节点被替换成新的 opacity:0 节点。因此这里用 MutationObserver 监听
+  // 容器，任何被重建/新增的 <video> 都立即处理，彻底免疫节点替换。
   useEffect(() => {
     const root = articleRef.current;
     if (!root) return;
-    const videos = Array.from(root.querySelectorAll("video")) as HTMLVideoElement[];
 
-    videos.forEach((video) => {
+    const revealVideo = (video: HTMLVideoElement) => {
       if (video.dataset.revealed) return; // 避免同一节点重复处理
       video.dataset.revealed = "1";
 
@@ -187,8 +189,17 @@ function BlogPostPage() {
       window.setTimeout(() => {
         if (!revealed) reveal();
       }, 4000);
-    });
-  }, [articleBody.html]);
+    };
+
+    const process = () => {
+      root.querySelectorAll("video").forEach((video) => revealVideo(video as HTMLVideoElement));
+    };
+
+    process();
+    const observer = new MutationObserver(process);
+    observer.observe(root, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, []);
   const coverImage = resolvePostCoverImage(localizedPost.coverImage);
 
   // 未勾选“显示在博客列表”的文章，仅管理员可见；其他访客看到提示而不是正文。
