@@ -171,9 +171,12 @@ function BlogPostPage() {
         reveal();
         return;
       }
-      // 无 poster 的视频：元数据就绪（loadedmetadata）即可正确显示尺寸与首帧，
-      // 不再等 loadeddata（preload=metadata 下不会触发），避免一直隐藏“看不到”。
-      // 同时监听 loadeddata 兜底；缓存命中时 readyState 已 >=1，直接显示。
+      // 无 poster 的视频：把 preload 升级为 auto，强制浏览器加载并显示首帧
+      //（入库的旧 HTML 可能仍是 preload="metadata"，仅靠元数据不会渲染首帧，
+      // 看起来就像“看不到 / 被遮挡”）。元数据就绪（loadedmetadata）即正确显示
+      // 尺寸与首帧，不再等 loadeddata；同时监听 loadeddata 兜底；缓存命中时
+      // readyState 已 >=1，直接显示。
+      video.preload = "auto";
       if (video.readyState >= 1) {
         reveal();
       } else {
